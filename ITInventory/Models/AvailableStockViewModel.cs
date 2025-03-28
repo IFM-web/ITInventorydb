@@ -8,11 +8,11 @@ namespace ContentManagementSystem.Models
         public string SearchTerm { get; set; }
         public DateTime? ReceivedDateFrom { get; set; }
         public DateTime? ReceivedDateTo { get; set; }
-        public List<Material> Materials { get; set; }
+        public List<MaterialItem> Materials { get; set; }
+       
+           public IEnumerable<MaterialItem> MaterialItems { get; set; }
+        
 
-        public AvailableStockViewModel()
-        {
-            Materials = new List<Material>();
-        }
-    }
+    
+}
 } 

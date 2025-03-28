@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ContentManagementSystem.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 using GuardTour;
 
 namespace ContentManagementSystem.Controllers
 {
+    
     public class UsersController : Controller
     {
         db_Utility util = new db_Utility();
@@ -31,7 +33,7 @@ namespace ContentManagementSystem.Controllers
 
                 HttpContext.Session.Clear();
               //  string cnpwd = EncryptionHelper.Encrypt(loginModel.password);
-                var ds = util.Fill("exec LoginValidate @username='" + loginModel.Username + "',@password='" + loginModel.Password + "' ", util.strElect);
+                var ds = util.Fill("exec LoginValidate @username='" + loginModel.Username.ToLower() + "',@password='" + loginModel.Password + "' ", util.strElect);
 
                 //  var userid = ds.Tables[0].Rows[0][0];
                 string errmsg = ds.Tables[0].Rows[0][1].ToString();
@@ -41,7 +43,7 @@ namespace ContentManagementSystem.Controllers
                     {
                         HttpContext.Session.SetString("UserId", ds.Tables[0].Rows[0]["UserId"].ToString());
                         HttpContext.Session.SetString("UserName", ds.Tables[0].Rows[0]["UserName"].ToString());
-                        return RedirectToAction("BranchLogin", "Admin");
+                        return RedirectToAction("Index", "Material");
                     }
                     else
                         ViewBag.msg = errmsg;

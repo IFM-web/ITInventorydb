@@ -1,4 +1,4 @@
-@model ContentManagementSystem.Models.AvailableItemViewModel
+@model IEnumerable<ContentManagementSystem.Models.MaterialItem>
 
 <div class="container-fluid">
     <div class="row">
@@ -15,7 +15,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="input-group">
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Search items..." value="@Model.SearchTerm">
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Search items..." value="@Model">
                                 <button class="btn btn-outline-secondary" type="submit">
                                     <i class="fas fa-search"></i>
                                 </button>
@@ -23,19 +23,19 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Bill Date Range</label>
-                            <div class="input-group">
-                                <input type="date" name="billDateFrom" class="form-control" value="@Model.BillDateFrom?.ToString("yyyy-MM-dd")" placeholder="From">
+                           @*  <div class="input-group">
+                                <input type="date" name="billDateFrom" class="form-control" value="@Model.WarrantyDate?.ToString("yyyy-MM-dd")" placeholder="From">
                                 <span class="input-group-text">to</span>
-                                <input type="date" name="billDateTo" class="form-control" value="@Model.BillDateTo?.ToString("yyyy-MM-dd")" placeholder="To">
-                            </div>
+                                <input type="date" name="billDateTo" class="form-control" value="@Model.WarrantyDate?.ToString("yyyy-MM-dd")" placeholder="To">
+                            </div> *@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Warranty Date Range</label>
-                            <div class="input-group">
-                                <input type="date" name="warrantyDateFrom" class="form-control" value="@Model.WarrantyDateFrom?.ToString("yyyy-MM-dd")" placeholder="From">
+                           @*  <div class="input-group">
+                                <input type="date" name="warrantyDateFrom" class="form-control" value="@Model.WarrantyDate?.ToString("yyyy-MM-dd")" placeholder="From">
                                 <span class="input-group-text">to</span>
-                                <input type="date" name="warrantyDateTo" class="form-control" value="@Model.WarrantyDateTo?.ToString("yyyy-MM-dd")" placeholder="To">
-                            </div>
+                                <input type="date" name="warrantyDateTo" class="form-control" value="@Model.WarrantyDate?.ToString("yyyy-MM-dd")" placeholder="To">
+                            </div> *@
                         </div>
                         <div class="col-md-12 text-end mt-3">
                             <button type="reset" class="btn btn-secondary">Clear Filters</button>
@@ -58,23 +58,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.AvailableItems)
+                            @foreach (var item in Model)
                             {
                                 <tr>
                                     <td>
-                                        @if (item.Material.AssetItem.Name == "Others")
+                                        @if (item.AssetItem == "Others")
                                         {
                                             @item.ItemName
                                         }
                                         else
                                         {
-                                            @item.Material.AssetItem.Name
+                                            @item.AssetItem
                                         }
                                     </td>
                                     <td>@item.SerialNo</td>
                                     <td>@item.ModelNo</td>
                                     <td>
-                                        @if (item.Material.AssetItem.Name != "Others")
+                                        @if (item.AssetItem != "Others")
                                         {
                                             <span>Gen: @item.Generation</span><br />
                                             <span>Processor: @item.CPUCapacity</span>
@@ -89,7 +89,7 @@
                                             @item.Other
                                         }
                                     </td>
-                                    <td>@item.Material.BillDate.ToShortDateString()</td>
+                                    <td>@item.BillDate</td>
                                     <td>@(item.WarrantyDate?.ToShortDateString() ?? "-")</td>
                                 </tr>
                             }
@@ -97,7 +97,7 @@
                     </table>
                 </div>
 
-                @if (!Model.AvailableItems.Any())
+                @if (Model==null)
                 {
                     <div class="alert alert-info mt-3">
                         No items found matching your criteria.

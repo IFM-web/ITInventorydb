@@ -10,14 +10,16 @@ namespace ContentManagementSystem.Models
     {
         private DateTime? _warrantyDate;
 
-        public MaterialItem()
-        {
-            Status = "UnAssigned";  // Set default value
-        }
-
+      
+        public string InvoiceNo { get; set; }
+        public string CustomAssetName { get; set; }
+        public string CustomVendorName { get; set; }
+        public string Manufacturer { get; set; }
+        public string CustomManufacturerName { get; set; }
+        public string Vendor { get; set; }
         public int Id { get; set; }
         public int MaterialId { get; set; }
-        public int AssetItemId { get; set; }  // Add this property
+        public string AssetItem { get; set; }  // Add this property
         public string Status { get; set; }
 
         // Common fields
@@ -43,6 +45,7 @@ namespace ContentManagementSystem.Models
             get => _warrantyDate;
             set => _warrantyDate = value;
         }
+        string SearchTerm { get; set; }
 
         [NotMapped]
         public string WarrantyDateString
@@ -60,12 +63,15 @@ namespace ContentManagementSystem.Models
             }
         }
 
+        public string  BillDate { get; set; } 
+
+        public string RecordDate { get; set; } 
         public string WindowsKey { get; set; }
         public string MSOfficeKey { get; set; }
 
         // Navigation properties
-        public virtual Material Material { get; set; }
-        public virtual AssetItem AssetItem { get; set; }  // Add this navigation property
+        //public virtual Material Material { get; set; }
+        
     }
 
 

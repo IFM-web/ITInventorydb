@@ -12,7 +12,7 @@ namespace ContentManagementSystem.Models
     public class AssignedAssetItem
     {
         public int MaterialOutId { get; set; }
-        public DateTime IssuanceDate { get; set; }
+        public string IssuanceDate { get; set; }
         public string CompanyName { get; set; }
         public string BranchName { get; set; }
         public string EmployeeId { get; set; }
@@ -21,7 +21,7 @@ namespace ContentManagementSystem.Models
         public string AssetName { get; set; }
         public string SerialNo { get; set; }
         public string ModelNo { get; set; }
-        public DateTime? WarrantyDate { get; set; }
+        public string WarrantyDate { get; set; }
         public string Status { get; set; }
     }
 } 

@@ -1,5 +1,4 @@
 @model ContentManagementSystem.Models.MaterialViewModel
-
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
@@ -9,164 +8,215 @@
         <div class="col-md-10">
             <div class="container mt-4">
                 @* <h2>Material IN</h2> *@
-                <h3>Invoice Input Form</h3>
+                <h3>Material IN Form</h3>
 
-                @using (Html.BeginForm("Create", "Material", FormMethod.Post, new { enctype = "multipart/form-data", id = "materialForm", onsubmit = "return validateForm()" }))
 
-                {
-                    @Html.AntiForgeryToken()
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                @Html.LabelFor(m => m.NewMaterial.InvoiceNo, "Invoice Number", new { @class = "form-label" })
-                                @Html.TextBoxFor(m => m.NewMaterial.InvoiceNo, new
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label>Invoice Number</label>
+                            <input class="form-control  mandatory " name="Invoice" id="Invoice" required />
+
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Company</label>
+
+                            <select name="Company Name" class="form-control mandatory" id="Companyid" style="border: 1px solid lightgray;">
+                                <option value="0">Select</option>
+                                @if (ViewBag.Companies != null)
+
+
+                                {
+
+                                    foreach (var item in ViewBag.Companies as List<SelectListItem>)
+
                                     {
-                                        @class = "form-control",
-                                        placeholder = "Enter Invoice Number",
-                                        required = "required",
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
 
-                                        pattern = "^[a-zA-Z0-9-_/\\s]+$",
 
-                                        title = "Invoice number can contain letters, numbers, hyphens, underscores, forward slashes and spaces"
-
-                                    })
-                                @Html.ValidationMessageFor(m => m.NewMaterial.InvoiceNo, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="form-group mb-3">
-                                @Html.LabelFor(m => m.NewMaterial.CompanyId, "Company", new { @class = "form-label" })
-                                @Html.DropDownListFor(m => m.NewMaterial.CompanyId, (SelectList)ViewBag.Companies, null, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(m => m.NewMaterial.CompanyId, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="form-group mb-3">
-                                @Html.LabelFor(m => m.NewMaterial.AssetItemId, "Asset Item", new { @class = "form-label" })
-                                @Html.DropDownListFor(m => m.NewMaterial.AssetItemId, (SelectList)ViewBag.AssetItems, "Select Asset Item", new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.NewMaterial.AssetItemId, "", new { @class = "text-danger" })
-                            </div>
-                            <div id="customAssetNameDiv" style="display:none;" class="form-group mb-3">
-                                <label class="form-label">Custom Asset Name</label>
-                                <input type="text" class="form-control" name="NewMaterial.CustomAssetName" id="customAssetName" placeholder="Optional" />
-                            </div>
-                            <div class="form-group mb-3">
-                                @Html.LabelFor(m => m.NewMaterial.VendorId, "Vendor", new { @class = "form-label" })
-                                @Html.DropDownListFor(m => m.NewMaterial.VendorId, (SelectList)ViewBag.Vendors, "Select Vendor", new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.NewMaterial.VendorId, "", new { @class = "text-danger" })
-                            </div>
-                            <div id="customVendorNameDiv" style="display:none;" class="form-group mb-3">
-                                <label class="form-label">Custom Vendor Name</label>
-                                <input type="text" class="form-control" name="NewMaterial.CustomVendorName" id="customVendorName" placeholder="Enter Vendor Name" />
-                            </div>
+                                }
+                            </select>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                @Html.LabelFor(m => m.NewMaterial.ManufacturerId, "Manufacturer", new { @class = "form-label" })
-                                @Html.DropDownListFor(m => m.NewMaterial.ManufacturerId, (SelectList)ViewBag.Manufacturers, "Select Manufacturer", new { @class = "form-control", required = "required" })
-                                @Html.ValidationMessageFor(m => m.NewMaterial.ManufacturerId, "", new { @class = "text-danger" })
-                            </div>
-                            <div id="customManufacturerNameDiv" style="display:none;" class="form-group mb-3">
-                                <label class="form-label">Custom Manufacturer Name</label>
-                                <input type="text" class="form-control" name="NewMaterial.CustomManufacturerName" id="customManufacturerName" placeholder="Enter Manufacturer Name" />
-                            </div>
-                            <div class="form-group mb-3">
-                                @Html.LabelFor(m => m.NewMaterial.BillDate, "Bill Date", new { @class = "form-label" })
-                                <div class="input-group">
-                                    <input type="text"
-                                           id="BillDate"
-                                           name="NewMaterial.BillDate"
-                                           class="form-control date-picker"
-                                           required
-                                           placeholder="DD/MM/YYYY"
-                                           autocomplete="off" />
-                                    <span class="input-group-text">
-                                        <i class="fas fa-calendar"></i>
-                                    </span>
-                                </div>
-                                @Html.ValidationMessageFor(m => m.NewMaterial.BillDate, "", new { @class = "text-danger" })
-                            </div>
+                     
+                      <div class="form-group mb-3">
+                                           
 
-                            <div class="form-group mb-3">
-                                <label class="form-label">Received Date</label>
-                                <div class="input-group">
-                                    <input type="text"
-                                           class="form-control date-picker"
-                                           name="ReceivedDate"
-                                           required
-                                           placeholder="DD/MM/YYYY"
-                                           autocomplete="off" />
-                                    <span class="input-group-text">
-                                        <i class="fas fa-calendar"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="form-group mb-3">
-                                @Html.LabelFor(m => m.NewMaterial.ReqnQuantity, "Receive Quantity", new { @class = "form-label" })
-                                <div class="input-group">
-                                    @Html.TextBoxFor(m => m.NewMaterial.ReqnQuantity, new { @class = "form-control", type = "number", min = "1", value = "1", id = "reqnQuantity", @readonly = "readonly" })
-                                    @*  <button type="button" class="btn btn-secondary" onclick="decrementQuantity()">-</button> *@
-                                    <button type="button" class="btn btn-secondary" onclick="incrementQuantity()">+</button>
-                                </div>
-                                @Html.ValidationMessageFor(m => m.NewMaterial.ReqnQuantity, "", new { @class = "text-danger" })
-                            </div>
+                          @*   <select name="Vendor Name" id="Vendor" class="form-control mandatory select2" style="width: 100%;">
+                                <option value="">-- Select Vendor --</option>
+                                @if (ViewBag.Vendors != null)
+
+                                {
+                                    foreach (var item in ViewBag.Vendors as List<SelectListItem>)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                }
+                            </select> *@
+                            
+
+                        
+                  
+                            <label class="form-label">Vendor Name</label>
+                            <input type="text" class="form-control" name="NewMaterial.CustomVendorName" id="customVendorName" placeholder="Enter Vendor Name" />
+                   
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Asset Item</label>
+
+
+                            <select name="AssetItem Name" class="form-control mandatory" id="AssetItem" style="border: 1px solid lightgray;">
+                                <option value="0">Select</option>
+                                @if (ViewBag.AssetItems != null)
+
+                                {
+
+
+
+                                    foreach (var item in ViewBag.AssetItems as List<SelectListItem>)
+
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+
+
+
+                                }
+                            </select>
+                        </div>
+                        <div id="customAssetNameDiv" style="display:none;" class="form-group mb-3">
+                            <label class="form-label">Custom Asset Name</label>
+                            <input type="text" class="form-control" id="customAssetName" placeholder="Optional" />
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label>Manufacturer</label>
 
-                    <div class="mb-3">
-                        <label class="form-label">Invoice Image</label>
-                        <div>
-                            <button type="button" class="btn btn-secondary" onclick="uploadInvoice()">
-                                <i class="fas fa-upload"></i> Upload Invoice Images
-                            </button>
-                            <input type="file" id="invoiceUpload" name="ImageFile" style="display: none;" />
+
+                            <select name="Manufacturer Name"  class="form-control mandatory" id="Manufacturer" style="border: 1px solid lightgray;">
+                                <option value="0">Select</option>
+                                @if (ViewBag.Manufacturers != null)
+
+                                {
+                                    foreach (var item in ViewBag.Manufacturers as List<SelectListItem>)
+
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+
+                                }
+                            </select>
+                        </div>
+                        <div id="customManufacturerNameDiv" style="display:none;" class="form-group mb-3">
+                            <label class="form-label">Custom Manufacturer Name</label>
+                            <input type="text" class="form-control" name="NewMaterial.CustomManufacturerName" id="customManufacturerName" placeholder="Enter Manufacturer Name" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Bill Date</label>
+                            <div class="input-group">
+                                <input type="text"
+                                       id="BillDate"
+                                       name="BillDate"
+                                       class="form-control date-picker"
+                                       required
+                                       placeholder="DD/MM/YYYY"
+                                       autocomplete="off" />
+                                <span class="input-group-text">
+                                    <i class="fas fa-calendar"></i>
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Received Date</label>
+                            <div class="input-group">
+                                <input type="text" id="ReceivedDate"
+                                       class="form-control date-picker"
+                                       name="ReceivedDate"
+                                       required
+                                       placeholder="DD/MM/YYYY"
+                                       autocomplete="off" />
+                                <span class="input-group-text">
+                                    <i class="fas fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <lable>Receive Quantity</lable>
+                            <div class="input-group">
+
+                                <input type="number" class="form-control" min="1" value="1" id="reqnQuantity" readonly="readonly" />
+                                @*  <button type="button" class="btn btn-secondary" onclick="decrementQuantity()">-</button> *@
+                                <button type="button" class="btn btn-secondary" onclick="incrementQuantity()">+</button>
+                            </div>
+
                         </div>
                     </div>
+                </div>
 
-                    <div class="table-responsive" id="details">
-                        <table class="table table-bordered" id="itemsTable">
-                            <thead>
-                                <tr>
-                                    <th>Sr No</th>
-                                    <th>Asset Type</th>
-                                    <th class="d-none">AssetTypeId</th>
-                                    <th>Serial No</th>
-                                    @* <th id="thItemName" class="d-none">Item Name</th> *@
-                                    <th id="thWarrantyDate">Warranty&nbsp;Date</th>
-                                    <th>Model No</th>
-                                    <th id="thGeneration">Generation</th>
-                                    <th id="thCPU">Processor</th>
-                                    <th id="thRAM">RAM (GB)</th>
-                                    <th id="thHDD">Hard Disk</th>
-                                    <th id="thSSD">SSD </th>
-                                    <th id="thOther">Other</th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemsTableBody">
-                            </tbody>
-                        </table>
+                <div class="mb-3">
+                    <label class="form-label">Invoice Image</label>
+                    <div>
+                        <button type="button" class="btn btn-secondary" onclick="uploadInvoice()">
+                            <i class="fas fa-upload"></i> Upload Invoice Images
+                        </button>
+                        <input type="file" id="invoiceUpload" name="ImageFile" style="display :None" />
                     </div>
+                </div>
 
-                    <div class="table-responsive" id="Otherdetails">
-                        <table class="table table-bordered" id="itemsTable">
-                            <thead>
-                                <tr>
-                                    <th>Sr No</th>
-                                    <th>Asset Type</th>
-                                    <th class="d-none">AssetTypeId</th>
-                                    <th>Serial No</th>
-                                    <th id="thItemName">Item Name</th>
-                                    <th id="thWarrantyDate">Warranty Date</th>
-                                    <th>Model No</th>
-                                    <th id="thOther">Other</th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemsTableBody2">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive" id="details">
+                    <table class="table table-bordered" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Asset Type</th>
+                                <th class="d-none">AssetTypeId</th>
+                                <th>Serial No</th>
+                                @* <th id="thItemName" class="d-none">Item Name</th> *@
+                                <th id="thWarrantyDate">Warranty&nbsp;Date</th>
+                                <th>Model No</th>
+                                <th id="thGeneration">Generation</th>
+                                <th id="thCPU">Processor</th>
+                                <th id="thRAM">RAM (GB)</th>
+                                <th id="thHDD">Hard Disk</th>
+                                <th id="thSSD">SSD </th>
+                                <th id="thOther">Other</th>
+                                <th id="Action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        @* <a href="@Url.Action("InvoiceDashboard", "Material")" class="btn btn-secondary">View All Invoices</a> *@
-                    </div>
-                }
+                <div class="table-responsive" id="Otherdetails">
+                    <table class="table table-bordered" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Asset Type</th>
+                                <th class="d-none">AssetTypeId</th>
+                                <th>Serial No</th>
+                                <th id="thItemName">Item Name</th>
+                                <th id="thWarrantyDate">Warranty Date</th>
+                                <th>Model No</th>
+                                <th id="thOther">Other</th>
+                                <th id="Action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody2">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-end">
+                    <button onclick="Insert()" class="btn btn-primary">Submit</button>
+                    @* <a href="@Url.Action("InvoiceDashboard", "Material")" class="btn btn-secondary">View All Invoices</a> *@
+                </div>
+                
             </div>
         </div>
     </div>
@@ -197,26 +247,74 @@
             border-color: #0056b3 !important;
         }
     </style>
-}
+}<!-- jQuery (Must be included before Datepicker) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-@section Scripts {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-    <script src="~/js/MatrialIn.js">
-        <script>
-        @if (TempData["Success"] != null)
+<!-- Bootstrap 4 or 5 (If using Bootstrap) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-        {
-            <text>
-                    $(document).ready(function() {
-                        toastr.success('@TempData["Success"]');
-                    });
-            </text>
-        }
+<!-- Bootstrap Datepicker -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
-    </script>
-}
+
+<!-- Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+
+
+<script src="~/js/MatrialIn.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#Vendor').select2({
+            tags: true,  // Allows adding new options
+            placeholder: "Select or Add Vendor",
+            allowClear: true
+        });
+
+
+        $(document).ready(function () {
+            $(".date-picker").datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                clearBtn: true
+            });
+
+            $('.input-group-text').click(function () {
+                let inputField = $(this).closest('.input-group').find('.date-picker');
+                if (inputField.length) {
+                    inputField.datepicker('show');
+                } else {
+                    console.error("Datepicker input field not found.");
+                }
+            });
+        });
+    });
+
+    
+
+    $('input[name="BillDate"],input[name="ReceivedDate"]').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                clearBtn: true
+            });
+
+            // Update the search form
+            $('.date-picker').on('changeDate', function() {
+                $(this).datepicker('hide');
+            });
+
+
+
+</script>
+
 
 <style>
     .accordion-button:not(.collapsed) {

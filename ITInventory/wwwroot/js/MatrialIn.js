@@ -1,7 +1,18 @@
-﻿function updateTableRows() {
+﻿
+
+function geturl() {
+    let url = window.location.hostname;
+    if (url == 'localhost') {
+        return '';
+    }
+    else
+        return '/itinventory';
+}
+let myurl = geturl();
+function updateTableRows() {
     const quantity = parseInt(document.getElementById('reqnQuantity').value);
-    const assetType = $("#NewMaterial_AssetItemId option:selected").text();
-    const assetTypeid = $("#NewMaterial_AssetItemId").val();
+    const assetType = $("#AssetItem option:selected").text();
+    const assetTypeid = $("#AssetItem").val();
  
     // tbody.innerHTML = '';
     
@@ -16,72 +27,74 @@
                             <td>${assetType}</td>
                              <td class='d-none'>
                                       <input type="text"
-                               name="NewMaterial.MaterialItems[${i}].AssetItemId"  value='${assetTypeid}'
-                               class="form-control" 
+                               name="${assetType} AssetItem Name"  value='${assetTypeid}'
+                               class="form-control AssetItemId" 
                                 />
 
                                   </td>
                     <td>
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].SerialNo" 
-                               class="form-control" 
+                               name="N${assetType} SerialNo" 
+                               class="form-control SerialNo mandatory" 
                                required />
                     </td>
                  
                     <td>
                         <div class="input-group">
-                            <input type="text" 
-                                   name="NewMaterial.MaterialItems[${i}].WarrantyDate" 
-                                   class="form-control date-picker warranty-date" 
-                                   placeholder="DD/MM/YYYY"
-                                   autocomplete="off" required />
-                            <span class="input-group-text">
-                                <i class="fas fa-calendar"></i>
-                            </span>
+                            <input type="date"  
+                                   name="${assetType} WarrantyDate" 
+                                   class="form-control  warranty-date mandatory" 
+                                    />
+                            
                         </div>
                     </td>
                     <td>
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].ModelNo" 
-                               class="form-control" 
+                               name="${assetType} ModelNo" 
+                               class="form-control ModelNo mandatory" 
                                required />
                     </td>
                     <td id="tdGeneration${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].Generation" 
-                               class="form-control"
+                               name="${assetType} Generation" 
+                               class="form-control Generation mandatory"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdCPU${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].CPUCapacity" 
-                               class="form-control"
+                               name="${assetType} CPUCapacity" 
+                               class="form-control CPUCapacity mandatory"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdHDD${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].RAMCapacity" 
-                               class="form-control"
+                               name="${assetType} RAMCapacity" 
+                               class="form-control RAMCapacity mandatory"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdRAM${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].HardDisk" 
-                               class="form-control"
+                               name="${assetType} HardDisk" 
+                               class="form-control HardDisk"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdSSD${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].SSDCapacity" 
-                               class="form-control" 
+                               name="${assetType} SSDCapacity" 
+                               class="form-control SSDCapacity" 
                                value="" />
                     </td>
                     <td>
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].Other" 
-                               class="form-control" 
+                               name="${assetType} Other" 
+                               class="form-control Other" 
                                placeholder="Enter other details" />
                     </td>
+                    <td>
+    <button class='btn btn-danger' onclick="removeRow(this)"> 
+        <i class="fas fa-trash-alt"></i> 
+    </button>
+</td>
                 `;
             tbody.append(row);
         }
@@ -96,77 +109,79 @@
                             <td>${assetType}</td>
                                     <td class='d-none'>
                                       <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].AssetItemId"  value='${assetTypeid}'
-                               class="form-control" 
+                               name="${assetType} AssetItemId"  value='${assetTypeid}'
+                               class="form-control AssetItemId" 
                                 />
 
                                   </td>
                     <td>
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].SerialNo" 
-                               class="form-control" 
+                               name="SerialNo" 
+                               class="form-control SerialNo mandatory" 
                                required />
                     </td>
                     <td id="tdItemName${i}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].ItemName" 
-                               class="form-control"
+                               name="${assetType} ItemName" 
+                               class="form-control ItemName mandatory"
                                ${!isComputerAsset ? 'required' : ''} />
                     </td>
                     <td>
                         <div class="input-group">
-                            <input type="text" 
-                                   name="NewMaterial.MaterialItems[${i}].WarrantyDate" 
-                                   class="form-control date-picker warranty-date" 
-                                   placeholder="DD/MM/YYYY"
-                                   autocomplete="off" />
-                            <span class="input-group-text">
-                                <i class="fas fa-calendar"></i>
-                            </span>
+                            <input type="date" 
+                                   name="${assetType} WarrantyDate" 
+                                   class="form-control  warranty-date mandatory" 
+                                 />
+                           
                         </div>
                     </td>
                     <td>
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].ModelNo" 
-                               class="form-control" 
+                               name="${assetType} ModelNo" 
+                               class="form-control ModelNo mandatory" 
                                required />
                     </td>
                     <td id="tdGeneration${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].Generation" 
+                               name="${assetType} Generation" 
                                class="form-control"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdCPU${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="number" 
-                               name="NewMaterial.MaterialItems[${i}].CPUCapacity" 
+                               name="${assetType} CPUCapacity" 
                                class="form-control"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdHDD${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="number" 
-                               name="NewMaterial.MaterialItems[${i}].HardDisk" 
+                               name="HardDisk" 
                                class="form-control"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdRAM${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="number" 
-                               name="NewMaterial.MaterialItems[${i}].RAMCapacity" 
+                               name="RAMCapacity" 
                                class="form-control"
                                ${isComputerAsset ? 'required' : ''} />
                     </td>
                     <td id="tdSSD${i}" style="display:${isComputerAsset ? '' : 'none'}">
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].SSDCapacity" 
+                               name="SSDCapacity" 
                                class="form-control" 
                                value="" />
                     </td>
                     <td>
                         <input type="text" 
-                               name="NewMaterial.MaterialItems[${i}].Other" 
+                               name="Other" 
                                class="form-control" 
                                placeholder="Enter other details" />
                     </td>
+                      <td>
+    <button class='btn btn-danger' onclick="removeRow(this)">
+        <i class="fas fa-trash-alt"></i> 
+    </button>
+</td>
                 `;
             tbody.append(row);
         }
@@ -177,60 +192,33 @@
 
     $("#reqnQuantity").val(dataRowCount+dataRowCount2)
 
-    
-
+   
     // Initialize date pickers for warranty dates
-    $('.warranty-date').datepicker({
-        format: 'dd/mm/yyyy',
-        autoclose: true,
-        todayHighlight: true,
-        clearBtn: true,
-        startDate: '01/01/2000',
-        endDate: '31/12/2100'
-    });
+ 
 
-    // Click handler for calendar icons
-    $('.input-group-text').click(function () {
-        $(this).closest('.input-group').find('.date-picker').datepicker('show');
-    });
+     
+    //$(".date-picker").datepicker(); // Initialize Datepicker
+
 
     // Update validation when date changes
     $('.warranty-date').on('changeDate', function () {
         $(this).datepicker('hide');
-        validateDate($(this));
+       // validateDate($(this));
     });
 }
+function removeRow(button) {
+    // This removes the row that contains the button
+    var row = button.closest('tr');
 
-function validateDate(input) {
-    const value = input.val();
-    if (!value) return true;
-
-    const [day, month, year] = value.split('/').map(num => parseInt(num, 10));
-
-    // Check if all parts are numbers
-    if (isNaN(day) || isNaN(month) || isNaN(year)) {
-        showDateError(input, 'Please enter a valid date in DD/MM/YYYY format');
-        return false;
-    }
-
-    // Check ranges
-    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2000 || year > 2100) {
-        showDateError(input, 'Please enter a valid date');
-        return false;
-    }
-
-    // Create date object for additional validation
-    const date = new Date(year, month - 1, day);
-    if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
-        showDateError(input, 'Please enter a valid date');
-        return false;
-    }
-
-    input.removeClass('is-invalid').addClass('is-valid');
-    input.next('.invalid-feedback').remove();
-    return true;
+    row.remove();
+    const input = document.getElementById('reqnQuantity');
+    input.value = parseInt(input.value) - 1;
 }
 
+
+function uploadInvoice() {
+    document.getElementById('invoiceUpload').click();
+}
 function showDateError(input, message) {
     input.addClass('is-invalid').removeClass('is-valid');
     if (!input.next('.invalid-feedback').length) {
@@ -268,10 +256,10 @@ document.getElementById('reqnQuantity').addEventListener('change', updateTableRo
 
 // Add event listener for asset item change
 $(document).ready(function () {
-    $('#NewMaterial_AssetItemId, #NewMaterial_VendorId, #NewMaterial_ManufacturerId').change(function () {
-        const assetType = $("#NewMaterial_AssetItemId option:selected").text();
-        const vendorType = $("#NewMaterial_VendorId option:selected").text();
-        const manufacturerType = $("#NewMaterial_ManufacturerId option:selected").text();
+    $('#AssetItem, #Vendor, #Manufacturer').change(function () {
+        const assetType = $("#AssetItem option:selected").text();
+        const vendorType = $("#Vendor option:selected").text();
+        const manufacturerType = $("#Manufacturer option:selected").text();
 
         // Show/hide custom name fields
         $('#customAssetNameDiv').toggle(assetType === 'Others');
@@ -280,6 +268,16 @@ $(document).ready(function () {
 
         // Clear and regenerate material items
         //updateTableRows();
+    });
+
+
+    $('.warranty-date').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true,
+        clearBtn: true,
+        startDate: '01/01/2000',
+        endDate: '31/12/2100'
     });
 });
 
@@ -370,14 +368,7 @@ $('#NewMaterial_ManufacturerId').change(function () {
 });
 
 $(document).ready(function () {
-    $(document).on('blur', '[name$="WarrantyDate"]', function () {
-        const value = $(this).val();
-        if (value && !validateDate($(this))) {
-            $(this).addClass('is-invalid');
-            $(this).next('.invalid-feedback').remove();
-            $(this).after('<div class="invalid-feedback">Please enter a valid date in DD/MM/YYYY format</div>');
-        }
-    });
+   
 });
 
 
@@ -505,6 +496,48 @@ function showDateError(input, message) {
     }
 }
 
+function Validation() {
+    var msg = "";
+    var charregex = /^[a-zA-Z\s]+$/;
+    var intregex = /^[0-9]+$/;
+    var charintregex = /^[a-zA-Z0-9\s]+$/;
+
+
+    $(".mandatory").each(function () {
+        if ($(this).val() == "" || $(this).val() == "0") {
+            var name = $(this).attr('name')
+            console.log($(this).val());
+            msg += "" + name + "  Required !!\n";
+        }
+    });
+
+    $(".checktaxes").each(function () {
+        if ($(this).val() == "") {
+            var name = $(this).attr('name')
+            console.log($(this).val());
+            msg += "" + name + "  Required !!\n";
+        }
+    });
+    $(".chkint").each(function () {
+        if (!intregex.test($(this).val())) {
+            var name = $(this).attr('name')
+            msg += "Enter Valid " + name + "!!\n";
+        }
+    });
+    $(".chkcharint").each(function () {
+        if (!charintregex.test($(this).val())) {
+            var name = $(this).attr('name')
+            msg += "Enter Valid " + name + "!!\n";
+        }
+    });
+    $(".chkchar").each(function () {
+        if (!charregex.test($(this).val())) {
+            var name = $(this).attr('name')
+            msg += "Enter Valid " + name + "!!\n";
+        }
+    });
+    return msg;
+}
 
 $(document).ready(function () {
     initializeDateInputs();
@@ -549,7 +582,7 @@ $(document).ready(function () {
     // Prevent future dates for received date
     $('input[name="ReceivedDate"]').datepicker('setEndDate', 'today');
 
-    // Click handler for calendar icons
+     //Click handler for calendar icons
     $('.input-group-text').click(function () {
         $(this).closest('.input-group').find('.date-picker').datepicker('show');
     });
@@ -560,3 +593,97 @@ $(document).ready(function () {
         validateDate($(this));
     });
 });
+
+
+function Insert() {
+    let val = Validation()
+    if (val == "") {
+
+   
+    var fdata = new FormData();
+
+    fdata.append("Invoice", $("#Invoice").val());
+    fdata.append("Companyid", $("#Companyid").val());
+    fdata.append("AssetItem", $("#AssetItem").val());
+    fdata.append("customAssetName", $("#customAssetName").val());
+    fdata.append("Vendor", $("#Vendor").val());
+    fdata.append("customVendorName", $("#customVendorName").val());
+    fdata.append("Manufacturer", $("#Manufacturer").val());
+    fdata.append("customManufacturerName", $("#customManufacturerName").val());
+    fdata.append("BillDate", $("#BillDate").val());
+    fdata.append("ReceivedDate", $("#ReceivedDate").val());
+    fdata.append("reqnQuantity", $("#reqnQuantity").val());
+    var itemsArray = [];
+
+    $("#itemsTableBody TR").each(function (index, row) {
+        var Items = {};
+
+        Items.AssetItemId = $(row).find('.AssetItemId').val();
+        Items.SerialNo = $(row).find('.SerialNo').val();
+        Items.warrantydate = $(row).find('.warranty-date').val();
+        Items.ModelNo = $(row).find('.ModelNo').val();
+        Items.Generation = $(row).find('.Generation').val();
+        Items.CPUCapacity = $(row).find('.CPUCapacity').val();
+        Items.RAMCapacity = $(row).find('.RAMCapacity').val();
+        Items.HardDisk = $(row).find('.HardDisk').val();
+        Items.SSDCapacity = $(row).find('.SSDCapacity').val();
+        Items.Other = $(row).find('.Other').val();
+        Items.ItemName = "";
+        itemsArray.push(Items);  // Add to array
+    });
+
+    $("#itemsTableBody2 TR").each(function (index, row) {
+        var Items = {};
+
+        Items.AssetItemId = $(row).find('.AssetItemId').val();
+        Items.SerialNo = $(row).find('.SerialNo').val();
+        Items.ItemName = $(row).find('.ItemName').val();
+        Items.warrantydate = $(row).find('.warranty-date').val();
+        Items.ModelNo = $(row).find('.ModelNo').val();
+        Items.Generation = $(row).find('.Generation').val();
+        Items.CPUCapacity = $(row).find('.CPUCapacity').val();
+        Items.RAMCapacity = $(row).find('.RAMCapacity').val();
+        Items.HardDisk = $(row).find('.HardDisk').val();
+        Items.SSDCapacity = $(row).find('.SSDCapacity').val();
+        Items.Other = $(row).find('.Other').val();
+        itemsArray.push(Items);  // Add to array
+    });
+
+    console.log(itemsArray);  // Final array of objects
+
+    fdata.append("JsonData", JSON.stringify(itemsArray));
+
+
+   
+        //var files = $('#invoiceUpload')[0].files;
+
+        var guestFileUpload = $("#invoiceUpload").get(0);
+                    if (guestFileUpload.files.length > 0) {
+        fdata.append("file", guestFileUpload.files[0]);
+                    }
+
+ 
+
+    $.ajax({
+       
+        url: myurl+'/Material/Addnew',
+        type: 'post',
+        data: fdata,                 
+        contentType: false,          
+        processData: false,
+        success: function (data) {
+            if (data.message == 'Matrial In SuccessFully') {
+                window.location.reload();
+            }
+            alert(data.message);
+            
+        },
+        error: function (err) {
+            console.log("Error:", err);
+            alert("Something went wrong!");
+        }
+    });
+    } else {
+        alert(val);
+    }
+}

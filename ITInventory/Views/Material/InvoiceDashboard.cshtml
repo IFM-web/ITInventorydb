@@ -16,31 +16,44 @@
                     <div class="card-body">
                         <form method="get" id="filterForm">
                             <div class="row mb-3">
-                                <div class="col-md-3">
+                               @*  <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Search</label>
                                         <input type="text" id="searchTerm" name="searchTerm" class="form-control" 
                                                value="@Model.SearchTerm" placeholder="Search invoices...">
                                     </div>
-                                </div>
+                                </div> *@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Bill Date From</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control date-picker" id="startDate" 
-                                                   name="startDate" value="@Model.StartDate" placeholder="DD/MM/YYYY">
-                                            <span class="input-group-text">
-                                                <i class="fas fa-calendar"></i>
-                                            </span>
-                                        </div>
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       id="BillDatefrom"
+                                                       name="BillDatefrom"
+                                                       class="form-control date-picker"
+                                                       
+                                                       placeholder="DD/MM/YYYY"
+                                                       autocomplete="off" />
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-calendar"></i>
+                                                </span>
+                                            </div>
+
+                                     
+                                    </div>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label>Bill Date To</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control date-picker" id="endDate" 
-                                                   name="endDate" value="@Model.EndDate" placeholder="DD/MM/YYYY">
+                                            <input type="text"
+                                                   name="BillDateto"
+                                                   class="form-control date-picker"
+                                                   placeholder="To Date"
+                                                   @* value="@(Model.Received)" *@
+                                                   autocomplete="off" />
                                             <span class="input-group-text">
                                                 <i class="fas fa-calendar"></i>
                                             </span>
@@ -51,7 +64,7 @@
                                     <div class="form-group">
                                         <label>Received Date From</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control date-picker" id="receivedDateFrom" 
+                                            <input type="text" class="form-control datepicker date-picker" id="receivedDateFrom"
                                                    name="receivedDateFrom" value="@Model.ReceivedDateFrom" placeholder="DD/MM/YYYY">
                                             <span class="input-group-text">
                                                 <i class="fas fa-calendar"></i>
@@ -63,7 +76,7 @@
                                     <div class="form-group">
                                         <label>Received Date To</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control date-picker" id="receivedDateTo" 
+                                            <input type="text" class="form-control datepicker date-picker" id="receivedDateTo" 
                                                    name="receivedDateTo" value="@Model.ReceivedDateTo" placeholder="DD/MM/YYYY">
                                             <span class="input-group-text">
                                                 <i class="fas fa-calendar"></i>
@@ -71,7 +84,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-1">
+                                <div class="col-md-2">
                                     <div class="form-group">
                                         <label>&nbsp;</label>
                                         <div>
@@ -88,7 +101,12 @@
                         </form>
                     </div>
                 </div>
-                
+                <div class="row">
+                    <div class="col-3">
+                    <input class="form-control" type="text" id="filterInput" placeholder="Search Here" />
+                    </div>
+                </div>
+             
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered" id="invoiceTable">
                         <thead class="table-light">
@@ -115,13 +133,13 @@
                                         </button>
                                     </td>
                                     <td>@material.InvoiceNo</td>
-                                    <td>@material.BillDate.ToString("dd/MM/yyyy")</td>
-                                    <td>@material.RecordDate.ToString("dd/MM/yyyy")</td>
-                                    <td>@material.Company?.Name</td>
-                                    <td>@material.AssetItem?.Name</td>
-                                    <td class="asset-name d-none">@material.AssetItem?.Name</td>
-                                    <td>@material.CustomVendorName</td>
-                                    <td>@(material.CustomManufacturerName ?? material.Manufacturer?.Name)</td>
+                                    <td>@material.BillDate</td>
+                                    <td>@material.RecordDate</td>
+                                    <td>@material.Company</td>
+                                    <td>@material.AssetItem</td>
+
+                                    <td>@(material.CustomVendorName ?? material.Vendor)</td>
+                                    <td>@(material.CustomManufacturerName ?? material.Manufacturer)</td>
                                     <td>
                                         @if (!string.IsNullOrEmpty(material.ImagePath))
                                         {
@@ -133,7 +151,7 @@
                                             </a>
                                         }
                                     </td>
-                                    <td>@material.MaterialItems?.Count</td>
+                                    <td>@material.TotalItem</td>
                                 </tr>
                                 <tr class="expandable-row" style="display: none;">
                                     <td colspan="8">
@@ -150,7 +168,7 @@
                                                     <div class="col-md-9">
                                                         <div class="row">
                                                             <div class="col-md-4">
-                                                                <strong>Record Date:</strong> @material.RecordDate.ToString("dd/MM/yyyy")
+                                                                <strong>Record Date:</strong> @material.RecordDate
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <strong>Month:</strong> @material.Month
@@ -185,9 +203,9 @@
                                                         <tbody>
                                                             @foreach (var item in material.MaterialItems ?? new List<MaterialItem>())
                                                             {
-                                                                bool isComputerAsset = material.AssetItem.Name == "Desktop" || 
-                                                                    material.AssetItem.Name == "Laptop" || 
-                                                                    material.AssetItem.Name == "Server";
+                                                                bool isComputerAsset = material.AssetItem == "Desktop" || 
+                                                                    material.AssetItem == "Laptop" || 
+                                                                    material.AssetItem == "Server";
                                                                 <tr>
                                                                     <td>@item.SerialNo</td>
                                                                     <td>@item.ModelNo</td>
@@ -223,254 +241,64 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <style>
+        .dataTables_filter {
+            margin-top: 1rem;
+        }
+
+            .dataTables_filter input {
+                width: 300px !important;
+                height: 38px;
+                padding: 0.375rem 0.75rem;
+                font-size: 1rem;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+            }
+
+                .dataTables_filter input:focus {
+                    border-color: #86b7fe;
+                    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+                    outline: 0;
+                }
+
+        .datepicker {
+            z-index: 1060 !important;
+        }
+
+        .input-group-text {
+            cursor: pointer;
+        }
+
+            .input-group-text:hover {
+                background-color: #e9ecef;
+            }
+
+        .datepicker table tr td.today {
+            background-color: #FFF176 !important;
+            border-color: #FFE082 !important;
+        }
+
+        .datepicker table tr td.active {
+            background-color: #007bff !important;
+            border-color: #0056b3 !important;
+        }
+    </style>
+  
+}
 @section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-    
-    <script>
-        function geturl() {
-            let url = window.location.hostname;
-            if (url == 'localhost') {
-                return '';
-            }
-            else return '/itinventory';
-        }
-        let myurl = geturl();
-        // Function to open the image in a new tab
-        function openImage(imagePath) {
-            let baseUrl = geturl();
-            let fullUrl = baseUrl + imagePath;
-            window.open(fullUrl, '_blank');
-        }
-
-        $(document).ready(function() {
-            console.log('Document ready');
-
-            // Handle expand/collapse with direct click binding
-            $('.expand-button').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                var $button = $(this);
-                var materialId = $button.data('material-id');
-                var $icon = $button.find('i');
-                var $row = $button.closest('tr');
-                
-                console.log('Button clicked');
-                console.log('Material ID:', materialId);
-
-                if ($icon.hasClass('fa-chevron-circle-right')) {
-                    // Expanding
-                    $icon.removeClass('fa-chevron-circle-right').addClass('fa-chevron-circle-down');
-                    
-                    // Show loading indicator
-                    var loadingRow = `
-                        <tr class="expandable-row loading-row">
-                            <td colspan="10" class="text-center py-3">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </td>
-                        </tr>`;
-                    $row.after(loadingRow);
-
-                    // Make the AJAX call with correct URL
-                    $.ajax({
-                        url: myurl + '/Material/GetMaterialItems',
-                        type: 'GET',
-                        data: { materialId: materialId },
-                        success: function(response) {
-                            console.log('API Response:', response);
-                            $('.loading-row').remove();
-                            
-                            if (response.success && response.data) {
-                                // Get the asset type from the current row
-                                const assetType = $row.find('.asset-name').text().trim();
-                                var detailRow = generateItemsTable(response.data, assetType);
-                                $row.after(detailRow);
-                            } else {
-                                toastr.error('No items found or error loading items');
-                                $icon.removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-right');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Ajax Error:', error);
-                            console.error('Status:', status);
-                            console.error('Response:', xhr.responseText);
-                            $('.loading-row').remove();
-                            $icon.removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-right');
-                            toastr.error('Error loading material items');
-                        }
-                    });
-                } else {
-                    // Collapsing
-                    $icon.removeClass('fa-chevron-circle-down').addClass('fa-chevron-circle-right');
-                    $row.next('.expandable-row').remove();
-                }
-            });
-
-            function generateItemsTable(items, assetType) {
-                if (!items || items.length === 0) {
-                    return `
-                        <tr class="expandable-row">
-                            <td colspan="8" class="text-center py-3">
-                                No items found for this invoice
-                            </td>
-                        </tr>`;
-                }
-
-                var content = `
-                    <tr class="expandable-row">
-                        <td colspan="12" class="p-0">
-                            <div class="detail-content p-3">
-                                <div class="asset-type d-none">${assetType}</div>
-                                ${generateMaterialItemsTable(items, assetType)}
-                            </div>
-                        </td>
-                    </tr>`;
-
-                return content;
-            }
-
-            function generateMaterialItemsTable(items, assetType) {
-                const isComputerAsset = ['Desktop', 'Laptop', 'Server'].includes(assetType);
-                
-                // Define columns based on asset type
-                const commonColumns = `
-                    <th>Serial No</th>
-                    <th>Model No</th>
-                    <th>Warranty Date</th>
-                    <th>Status</th>
-                `;
-                
-                const computerColumns = `
-                    <th>Generation</th>
-                    <th>Processor</th>
-                    <th>RAM (GB)</th>
-                    <th>HDD</th>
-                    <th>SSD</th>
-                    <th>Windows Key</th>
-                    <th>MS Office Key</th>
-                `;
-                
-                const otherColumns = `
-                    <th>Item Name</th>
-                    <th>Other Details</th>
-                `;
-
-                let tableContent = `
-                    <table class="table table-sm table-bordered mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                ${commonColumns}
-                                ${isComputerAsset ? computerColumns : otherColumns}
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                items.forEach(function(item) {
-                    const commonCells = `
-                        <td>${item.serialNo || ''}</td>
-                        <td>${item.modelNo || ''}</td>
-                        <td>${item.warrantyDate || ''}</td>
-                        <td>
-                            <span class="badge ${item.status === 'Assigned' ? 'bg-success' : 'bg-primary'}">
-                                ${item.status || 'Available'}
-                            </span>
-                        </td>
-                    `;
-                    
-                    const computerCells = `
-                        <td>${item.generation || ''}</td>
-                        <td>${item.processor || ''}</td>
-                        <td>${item.ramCapacity || ''}</td>
-                        <td>${item.hardDisk || ''}</td>
-                        <td>${item.ssdCapacity || ''}</td>
-                        <td>${item.windowsKey || ''}</td>
-                        <td>${item.msOfficeKey || ''}</td>
-                    `;
-                    
-                    const otherCells = `
-                        <td>${item.itemName || ''}</td>
-                        <td>${item.other || ''}</td>
-                    `;
-
-                    tableContent += `
-                        <tr>
-                            ${commonCells}
-                            ${isComputerAsset ? computerCells : otherCells}
-                        </tr>
-                    `;
-                });
-
-                tableContent += `
-                        </tbody>
-                    </table>
-                `;
-
-                return tableContent;
-            }
-
-            // Log initial table state
-            console.log('Total rows:', $('#invoiceTable tbody tr.main-row').length);
-
-            // Initialize DataTable
-            var table = $('#invoiceTable').DataTable({
-                order: [[1, 'desc']],
-                pageLength: 25,
-                language: {
-                    search: "Search invoices:"
-                },
-                columnDefs: [
-                    { orderable: false, targets: 0 }
-                ]
-            });
-
-            // Initialize date pickers
-            $('.date-picker').datepicker({
-                format: 'dd/mm/yyyy',
-                autoclose: true,
-                todayHighlight: true
-            });
-
-            // Show success message if exists
-            @if (TempData["ShowMessage"]?.ToString() == "True")
-            {
-                <text>
-                Swal.fire({
-                    title: 'Success!',
-                    text: '@TempData["Success"]',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-                </text>
-            }
-
-            // Function to update column visibility based on asset type
-            function updateColumnVisibility() {
-                $('.table').each(function() {
-                    const assetType = $(this).closest('.detail-content').find('.asset-type').text();
-                    const isComputerAsset = ['Desktop', 'Laptop', 'Server'].includes(assetType);
-                    
-                    $(this).find('th.computer-specs, td.computer-specs').toggle(isComputerAsset);
-                    $(this).find('th.other-specs, td.other-specs').toggle(!isComputerAsset);
-                });
-            }
-
-            // Initial column visibility update
-            updateColumnVisibility();
-        });
-
-        function clearFilters() {
-            $('#searchTerm').val('');
-            $('.date-picker').val('');
-            $('#filterForm').submit();
-        }
-    </script>
+    <script src="~/js/InvoiceDashboard.js"></script>
+  
 
     <style>
         .expand-button {
@@ -573,4 +401,62 @@
             display: none !important;
         }
     </style>
+ 
+      
+
+
 } 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+
+    <script>
+
+        function exportexcel(type, fn, dl) {
+
+            var ddd = 'Available Stock';
+            var elt = document.getElementById('availableStockTableHid');
+            console.log(elt);
+            var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+
+
+            return dl ?
+                XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+                XLSX.writeFile(wb, fn || (ddd + '.' + (type || 'xlsx')));
+
+            // XLSX.writeFile(wb, fn || (ddd+ (type+ '.' || 'xlsx')));
+        }
+
+        $(document).ready(function () {
+            // Initialize datepickers
+        $('input[name="receivedDateFrom"],input[name="BillDatefrom"],input[name="BillDateto"], input[name="receivedDateTo"]').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true,
+                todayHighlight: true,
+                clearBtn: true
+            });
+
+            // Update the search form
+            $('.date-picker').on('changeDate', function () {
+                $(this).datepicker('hide');
+            });
+
+            $('#availableStockTable').DataTable({
+                order: [[0, 'desc']],
+                pageLength: 25,
+                language: {
+                    search: "Search items:",
+                    searchPlaceholder: "Search by any field..."
+                },
+                dom: "<'row'<'col-sm-12'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                // Style the search box
+                initComplete: function () {
+                    $('.dataTables_filter input').addClass('form-control');
+                    $('.dataTables_filter input').attr('placeholder', 'Search by any field...');
+                    $('.dataTables_filter').addClass('mb-3');
+                }
+            });
+        });
+    </script>

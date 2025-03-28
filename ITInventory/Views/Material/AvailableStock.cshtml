@@ -1,4 +1,5 @@
 @model ContentManagementSystem.Models.AvailableStockViewModel
+
 @{
     int i = 1;
 }
@@ -18,11 +19,12 @@
                 {
                     <div class="row mb-3">
                         <div class="col-md-3">
+                            <label>Received From Date</label>
                             <div class="input-group">
                                 <input type="text" 
                                        name="receivedDateFrom" 
                                        class="form-control date-picker" 
-                                       placeholder="From Date"
+                                       placeholder="Received From Date"
                                        value="@(Model.ReceivedDateFrom?.ToString("dd/MM/yyyy"))" 
                                        autocomplete="off" />
                                 <span class="input-group-text">
@@ -31,11 +33,12 @@
                             </div>
                         </div>
                         <div class="col-md-3">
+                            <label>Received To Date</label>
                             <div class="input-group">
                                 <input type="text" 
                                        name="receivedDateTo" 
                                        class="form-control date-picker" 
-                                       placeholder="To Date"
+                                       placeholder="Received To Date"
                                        value="@(Model.ReceivedDateTo?.ToString("dd/MM/yyyy"))" 
                                        autocomplete="off" />
                                 <span class="input-group-text">
@@ -43,7 +46,8 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4" style="margin-top:24px;">
+                        
                             <button type="submit" class="btn btn-primary">Search</button>
                             <a href="@Url.Action("AvailableStock")" class="btn btn-secondary">Reset</a>
                             <button type="submit" class="btn btn-primary" onclick="exportexcel()">Export Excel</button>
@@ -71,47 +75,46 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var material in Model.Materials)
-                            {
-                                foreach (var item in material.MaterialItems.Distinct())
+
+                            @foreach (var item in Model.Materials)
                                 {
                                     <tr>
-                                       
-                                        <td>@material.InvoiceNo</td>
+
+                                    <td>@item.InvoiceNo</td>
                                         <td>
-                                            @if (material.AssetItem.Name == "Others")
+                                            @if (item.AssetItem == "Others")
                                             {
-                                                @material.CustomAssetName
+                                            @(item.CustomAssetName)
+                                        }
+                                            else
+                                            {
+                                            @(item.AssetItem??item.CustomAssetName)
+                                        }
+                                        </td>
+                                        <td>
+                                            @if (item.Vendor == "Others")
+                                            {
+                                            @(item.CustomVendorName)
                                             }
                                             else
                                             {
-                                                @material.AssetItem.Name
+                                            @(item.Vendor ?? item.CustomVendorName)
                                             }
                                         </td>
                                         <td>
-                                            @if (material.Vendor?.Name == "Others")
+                                            @if (item.Manufacturer == "Others")
                                             {
-                                                @material.CustomVendorName
+                                            @(item.CustomManufacturerName)
                                             }
                                             else
                                             {
-                                                @(material.Vendor?.Name ?? "-")
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (material.Manufacturer?.Name == "Others")
-                                            {
-                                                @material.CustomManufacturerName
-                                            }
-                                            else
-                                            {
-                                                @(material.Manufacturer?.Name ?? "-")
+                                                @(item.Manufacturer ?? "-")
                                             }
                                         </td>
                                         <td>@item.SerialNo</td>
                                         <td>@item.ModelNo</td>
                                         <td>
-                                            @if (material.AssetItem.Name == "Others")
+                                            @if (item.AssetItem == "Others")
                                             {
                                                 @item.ItemName
                                                 if (!string.IsNullOrEmpty(item.Other))
@@ -119,7 +122,7 @@
                                                     <br/>@item.Other
                                                 }
                                             }
-                                            else if (material.AssetItem.Name == "Desktop" || material.AssetItem.Name == "Laptop" || material.AssetItem.Name == "Server")
+                                            else if (item.AssetItem == "Desktop" || item.AssetItem == "Laptop" || item.AssetItem == "Server")
                                             {
                                                 <span>Gen: @item.Generation</span><br/>
                                                 <span>Processor: @item.CPUCapacity</span>
@@ -137,8 +140,8 @@
                                                 }
                                             }
                                         </td>
-                                        <td>@(material.BillDate.ToString("dd/MM/yyyy") ?? "-")</td>
-                                        <td>@(material.RecordDate.ToString("dd/MM/yyyy") ?? "-")</td>
+                                        <td>@(item.BillDate)</td>
+                                        <td>@(item.RecordDate)</td>
                                         <td>@(item.WarrantyDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                                         <td>
                                             <span class="badge bg-success">@item.Status</span>
@@ -146,7 +149,7 @@
                                     </tr>
 
                                
-                                }
+                                
                             }
                         </tbody>
                     </table>
@@ -172,47 +175,40 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var material in Model.Materials)
-                            {
-                                foreach (var item in material.MaterialItems)
+
+                        @foreach (var item in Model.Materials)
                                 {
                                     <tr>
                                         <td>@i</td>
-                                        <td>@material.InvoiceNo</td>
+                            <td>@item.InvoiceNo</td>
                                         <td>
-                                            @if (material.AssetItem.Name == "Others")
+                                    @(item.CustomAssetName ?? item.AssetItem)
+
+                                </td>
+
+                                <td>
+                                    @(item.CustomVendorName!=""){
+                                    @(item.CustomVendorName)
+                                    }else{
+                                    @item.Vendor
+                                    }
+                              
+                                </td>
+
+                                        <td>
+                                @if (item.Manufacturer == "Others")
                                             {
-                                                @material.CustomAssetName
+                                    @item.CustomManufacturerName
                                             }
                                             else
                                             {
-                                                @material.AssetItem.Name
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (material.Vendor?.Name == "Others")
-                                            {
-                                                @material.CustomVendorName
-                                            }
-                                            else
-                                            {
-                                                @(material.Vendor?.Name ?? "-")
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (material.Manufacturer?.Name == "Others")
-                                            {
-                                                @material.CustomManufacturerName
-                                            }
-                                            else
-                                            {
-                                                @(material.Manufacturer?.Name ?? "-")
+                                    @(item.Manufacturer ?? "-")
                                             }
                                         </td>
                                         <td>@item.SerialNo</td>
                                         <td>@item.ModelNo</td>
                                         <td>
-                                            @if (material.AssetItem.Name == "Others")
+                                            @if (item.AssetItem == "Others")
                                             {
                                                 @item.ItemName
                                                 if (!string.IsNullOrEmpty(item.Other))
@@ -220,7 +216,7 @@
                                                     <br/>@item.Other
                                                 }
                                             }
-                                            else if (material.AssetItem.Name == "Desktop" || material.AssetItem.Name == "Laptop" || material.AssetItem.Name == "Server")
+                                else if (item.AssetItem == "Desktop" || item.AssetItem == "Laptop" || item.AssetItem == "Server")
                                             {
                                                 <span>Gen: @item.Generation</span><br/>
                                             <span>Processor: @item.CPUCapacity</span>
@@ -238,15 +234,15 @@
                                                 }
                                             }
                                         </td>
-                                        <td>@(material.BillDate.ToString("dd/MM/yyyy") ?? "-")</td>
-                                        <td>@(material.RecordDate.ToString("dd/MM/yyyy") ?? "-")</td>
-                                        <td>@(item.WarrantyDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                        <td>@(item.BillDate)</td>
+                                <td>@(item.RecordDate)</td>
+                                <td>@(item.WarrantyDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                                         <td>
                                             <span class="badge bg-success">@item.Status</span>
                                         </td>
                                 </tr>
                                 i++;
-                            }
+                           
                             }
                         </tbody>
                     </table>

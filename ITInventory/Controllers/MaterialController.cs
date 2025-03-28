@@ -13,135 +13,46 @@ using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Linq.Expressions;
 using Microsoft.VisualBasic;
+using GuardTour;
+using System.Data;
+using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace ContentManagementSystem.Controllers
 {
     public class MaterialController : Controller
     {
-        
-        private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ILogger<MaterialController> _logger;
-        private object 
-
-        public MaterialController( IWebHostEnvironment webHostEnvironment, ILogger<MaterialController> logger)
-        {
-           
-            _webHostEnvironment = webHostEnvironment;
-            _logger = logger;
-
-            // Add default branches if none exist
-            if (!Branches.Any())
-            {
-                var defaultBranches = new List<Branch>
-                {
-                    new Branch { Name = "Main Branch", CompanyId = 1 },
-                    new Branch { Name = "North Branch", CompanyId = 1 },
-                    new Branch { Name = "South Branch", CompanyId = 1 }
-                };
-                Branches.AddRange(defaultBranches);
-                SaveChanges();
-            }
-
-            // Add default employees if none exist
-            if (!Employees.Any())
-            {
-                var defaultEmployees = new List<Employee>
-                {
-                    new Employee
-                    {
-                        EmployeeId = "EMP001",
-                        Name = "John Doe",
-                        Department = "IT",
-                        Email = "john.doe@company.com",
-                        PhoneNo = "1234567890"
-                    },
-                    new Employee
-                    {
-                        EmployeeId = "EMP002",
-                        Name = "Jane Smith",
-                        Department = "HR",
-                        Email = "jane.smith@company.com",
-                        PhoneNo = "2345678901"
-                    },
-                    new Employee
-                    {
-                        EmployeeId = "EMP003",
-                        Name = "Mike Johnson",
-                        Department = "Finance",
-                        Email = "mike.johnson@company.com",
-                        PhoneNo = "3456789012"
-                    },
-                    new Employee
-                    {
-                        EmployeeId = "EMP004",
-                        Name = "Sarah Williams",
-                        Department = "Operations",
-                        Email = "sarah.williams@company.com",
-                        PhoneNo = "4567890123"
-                    }
-                };
-                Employees.AddRange(defaultEmployees);
-                SaveChanges();
-            }
-        }
+       db_Utility util=new db_Utility();
+       
 
         public IActionResult Index()
         {
             try
+
             {
-                if (!Companies.Any())
-                {
-                    var defaultCompany = new Company { Name = "ASP Securities" };
-                    Companies.Add(defaultCompany);
-                    SaveChanges();
-                }
+              
 
-                if (!Manufacturers.Any())
-                {
-                    var defaultManufacturers = new List<Manufacturer>
-                    {
-                        new Manufacturer { Name = "Dell" },
-                        new Manufacturer { Name = "Lenovo" },
-                        new Manufacturer { Name = "HP" }
-                    };
-                    Manufacturers.AddRange(defaultManufacturers);
-                    SaveChanges();
-                }
 
-                if (!Vendors.Any())
-                {
-                    var defaultVendors = new List<Vendor>
-                    {
-                        new Vendor { Name = "TCS" },
-                        new Vendor { Name = "Infosys" },
-                        new Vendor { Name = "HCL" }
-                    };
-                    Vendors.AddRange(defaultVendors);
-                    SaveChanges();
-                }
+                ViewBag.Companies = util.PopulateDropDown("select * from Companies where id=1", util.strElect);
+                ViewBag.AssetItems = util.PopulateDropDown("select * from AssetItems", util.strElect);
+                ViewBag.Vendors = util.PopulateDropDown("select * from Vendors", util.strElect);
+                ViewBag.Manufacturers = util.PopulateDropDown("select * from Manufacturers", util.strElect);
 
-                if (!AssetItems.Any())
-                {
-                    var defaultAssets = new List<AssetItem>
-                    {
-                        new AssetItem { Name = "Laptop" },
-                        new AssetItem { Name = "Desktop" },
-                        new AssetItem { Name = "Others" }
-                    };
-                    AssetItems.AddRange(defaultAssets);
-                    SaveChanges();
-                }
 
-                SetupViewBag();
-                ViewBag.ShowSidebar = true;
-                return View(GetMaterialViewModel());
+
+
+
+                return View();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in Index action: {ex.Message}");
-                return View("Error");
+               
+                return View();
             }
         }
+
+       
 
         private DateTime? ParseDate(string dateStr)
         {
@@ -161,295 +72,200 @@ namespace ContentManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error parsing date '{dateStr}': {ex.Message}");
+                
             }
             return null;
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(MaterialViewModel model, IFormFile ImageFile)
+        public IActionResult Addnew(IFormFile? file)
         {
             try
             {
-                if (model?.NewMaterial == null)
-                {
-                    ModelState.AddModelError("", "Invalid form submission");
-                    SetupViewBag();
-                    return View("Index", GetMaterialViewModel());
-                }
+                string Invoice = Request.Form["Invoice"].ToString();
+                string Companyid = Request.Form["Companyid"].ToString();
+                string AssetItem = Request.Form["AssetItem"].ToString();
+                string customAssetName = Request.Form["customAssetName"].ToString();
+                string Vendor = Request.Form["Vendor"].ToString();
+                string customVendorName = Request.Form["customVendorName"].ToString();
+                string Manufacturer = Request.Form["Manufacturer"].ToString();
+                string customManufacturerName = Request.Form["customManufacturerName"].ToString();
+                string BillDate = DateTime.ParseExact(Request.Form["BillDate"], "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
 
-                var material = model.NewMaterial;
-                var form = Request.Form;
-
-                // Parse Bill Date
-                var billDateStr = form["NewMaterial.BillDate"].ToString();
-                if (!string.IsNullOrEmpty(billDateStr))
+                
+                string ReceivedDate = Request.Form["ReceivedDate"].ToString();
+                string reqnQuantity = Request.Form["reqnQuantity"].ToString();
+                string invoiceUpload = Request.Form["files"];
+                string JsonData = Request.Form["JsonData"].ToString();
+                var objects = JArray.Parse(JsonData);
+                string Id = "";
+                string Metrailno = "";
+                foreach (var e in objects)
                 {
-                    if (DateTime.TryParseExact(billDateStr, "dd/MM/yyyy",
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.None,
-                        out DateTime billDate))
+                    var ds2 = util.Fill(@$"exec ChekcSerailNo @SerialNo='{e["SerialNo"]}' ", util.strElect);
+                   int  no = Convert.ToInt32(ds2.Tables[0].Rows[0][0]);
+                    if(no >0)
                     {
-                        material.BillDate = billDate;
+                        Id = "Duplicate Serial No : " + e["SerialNo"];
                     }
-                    else
-                    {
-                        ModelState.AddModelError("NewMaterial.BillDate", "Please enter date in DD/MM/YYYY format");
-                        SetupViewBag();
-                        return View("Index", GetMaterialViewModel(model?.NewMaterial));
-                    }
+                    
+                    
+
+
+
                 }
 
-                var isOtherAsset = AssetItems.Find(material.AssetItemId)?.Name == "Others";
-                var othersVendor = Vendors.FirstOrDefault(v => v.Name == "Others");
-                var othersManufacturer = Manufacturers.FirstOrDefault(m => m.Name == "Others");
-
-                // Remove validation for non-required fields when asset is Others
-                if (isOtherAsset)
+                
+                if (file != null && file.Length > 0)
                 {
-                    ModelState.Remove("NewMaterial.VendorId");
-                    ModelState.Remove("NewMaterial.ManufacturerId");
-                    ModelState.Remove("NewMaterial.BillDate");
-
-                    // Set values for non-required fields
-                    material.VendorId = othersVendor?.Id;
-                    material.ManufacturerId = othersManufacturer?.Id;
-                    material.BillDate = DateTime.Now;  // Or any default date you prefer
-                }
-                else
-                {
-                    // Validate required fields for non-Other assets
-                    if (!material.VendorId.HasValue)
-                        ModelState.AddModelError("NewMaterial.VendorId", "Vendor is required");
-                    if (!material.ManufacturerId.HasValue)
-                        ModelState.AddModelError("NewMaterial.ManufacturerId", "Manufacturer is required");
-                    if (material.BillDate == default)
-                        ModelState.AddModelError("NewMaterial.BillDate", "Bill Date is required");
-                }
-
-                _logger.LogInformation($"Attempting to create material with Invoice No: {material.InvoiceNo}");
-
-                // Log all incoming data
-                _logger.LogInformation($"Form Data: CompanyId={material.CompanyId}, " +
-                    $"AssetItemId={material.AssetItemId}, " +
-                    $"VendorId={material.VendorId}, " +
-                    $"ManufacturerId={material.ManufacturerId}, " +
-                    $"ReqnQuantity={material.ReqnQuantity}");
-
-                if (!ModelState.IsValid)
-                {
-                    var errors = string.Join("; ", ModelState.Values
-                        .SelectMany(x => x.Errors)
-                        .Select(x => x.ErrorMessage));
-                    _logger.LogWarning($"Model validation failed: {errors}");
-
-                    SetupViewBag();
-                    return View("Index", GetMaterialViewModel(material));
-                }
-
-                // Load related entities
-                material.AssetItem = AssetItems.Find(material.AssetItemId);
-
-                // Handle image upload if a file was provided
-                if (ImageFile != null && ImageFile.Length > 0)
-                {
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                    string uploadsFolder = Path.Combine("wwwroot", "uploads");
                     Directory.CreateDirectory(uploadsFolder); // Ensure directory exists
 
-                    string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(ImageFile.FileName)}";
+                    string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        ImageFile.CopyTo(fileStream);
+                        file.CopyTo(fileStream);
                     }
 
-                    material.ImagePath = $"/uploads/{uniqueFileName}";
-                    _logger.LogInformation($"Invoice image saved: {material.ImagePath}");
+                  
                 }
 
-                // Set the record date and other calculated fields
-                material.RecordDate = DateTime.Now;
-                material.Month = material.BillDate.ToString("MMMM");
-                material.Year = material.BillDate.Year.ToString();
-
-                // Get the form collection to process material items
-                var materialItems = new List<MaterialItem>();
-
-                // Get the number of items from the REQN quantity
-                int itemCount = material.ReqnQuantity;
-
-                bool isComputerAsset = material.AssetItem?.Name == "Desktop" || material.AssetItem?.Name == "Laptop" || material.AssetItem?.Name == "Server";
-
-                _logger.LogInformation($"Processing {itemCount} items for {(isComputerAsset ? "Computer" : "Other")} asset");
-
-
-                string[] SerialNo = form[$"NewMaterial.MaterialItems[0].SerialNo"];
-                string[] ModelNo = form[$"NewMaterial.MaterialItems[0].ModelNo"];
-                string[] Generation = form[$"NewMaterial.MaterialItems[0].Generation"];
-                string[] CPUCapacity = form[$"NewMaterial.MaterialItems[0].CPUCapacity"];
-                string[] HardDisk = form[$"NewMaterial.MaterialItems[0].HardDisk"];
-                string[] RAMCapacity = form[$"NewMaterial.MaterialItems[0].RAMCapacity"];
-                string[] SSDCapacity = form[$"NewMaterial.MaterialItems[0].SSDCapacity"];
-                string[] ItemName = form[$"NewMaterial.MaterialItems[0].ItemName"];
-                string[] Other = form[$"NewMaterial.MaterialItems[0].Other"];
-                string[] WarrantyDate = form[$"NewMaterial.MaterialItems[0].WarrantyDate"];
-                string[] AssetItemId = form[$"NewMaterial.MaterialItems[0].AssetItemId"];
-                for (int i = 0; i < itemCount; i++)
+                if (Id == "")
                 {
-                    try
-
+                var ds = util.Fill(@$"exec MatrialInMaster @Invoiceno='{Invoice}',@Company='{Companyid}',@assetitem='{AssetItem}',@cusassetname='{customAssetName}',@vendor='{Vendor}',@cusvendorname='{customVendorName}',@manufacture='{Manufacturer}',@cusmanufacture='{customManufacturerName}',@billdate='{BillDate}',@Receiveddate='{ReceivedDate}',@reciveqty='{reqnQuantity}',@InvoiceImg='{invoiceUpload}' ", util.strElect);
+                   
+                Id = ds.Tables[0].Rows[0][0].ToString();
+                    if (Id != "Invoice No Exist")
+                    {
+                        Metrailno = Id;
+                        Id = "";
+                    }
+                }
+                if (Id == "")
+                {
+                    DataSet ds1 = new DataSet();
+                    foreach(var e in objects)
                     {
 
-
-                        var item = new MaterialItem
-                        {
-
-                            SerialNo = SerialNo[i],
-                            ModelNo = ModelNo[i],
-                            AssetItemId = Convert.ToInt32(AssetItemId[i]),
-                            Status = "UnAssigned",
-
-
-                            Other = string.IsNullOrEmpty(Other[i]) ? " " : (Other[i]).ToString(),
-                            Generation = Generation[i],
-                            CPUCapacity = CPUCapacity[i],
-                            HardDisk = HardDisk[i],
-                            RAMCapacity = RAMCapacity[i],
-                            SSDCapacity = SSDCapacity[i],
-
-
-                        };
-
-                        _logger.LogInformation($"Processing item {i + 1}: SerialNo={item.SerialNo[i]}, ModelNo={item.ModelNo[i]}, AssetItemId={item.AssetItemId}");
-
-                        if (!isComputerAsset)
-                        {
-                            item.ItemName = string.IsNullOrEmpty(ItemName[i]) ? " " : (ItemName[i]).ToString();
-
-                        }
-                        _logger.LogInformation($"Computer specs: Gen={item.Generation}, CPU={item.CPUCapacity}, HDD={item.HardDisk}, RAM={item.RAMCapacity}, SSD={item.SSDCapacity}");
-                        //else
-                        //{
-                        //    item.ItemName = ItemName[i];
-                        //    item.Other = Other[i];
-                        //}
-                        // Parse warranty date
-                        var warrantyDateStr = WarrantyDate[i].ToString();
-                        if (!string.IsNullOrEmpty(warrantyDateStr))
-                        {
-                            if (DateTime.TryParseExact(warrantyDateStr, "dd/MM/yyyy",
-                                CultureInfo.InvariantCulture,
-                                DateTimeStyles.None,
-                                out DateTime warrantyDate))
-                            {
-                                item.WarrantyDate = warrantyDate;
-                            }
-                            else
-                            {
-                                ModelState.AddModelError("", $"Invalid warranty date format for item {i + 1}. Use DD/MM/YYYY");
-                                SetupViewBag();
-                                return View("Index", GetMaterialViewModel(model?.NewMaterial));
-                            }
-                        }
-
-                        materialItems.Add(item);
+                   ds1=util.Fill(@$"exec MatrialItems @Materialid='{Metrailno}',@Asstitemid='{e["AssetItemId"]}',@SerialNo='{e["SerialNo"]}',@Modelno='{e["ModelNo"]}',@Gen='{e["Generation"]}',@harddisk='{e["HardDisk"]}',@RamCap='{e["RAMCapacity"]}',@SSD='{e["SSDCapacity"]}',@Other='{e["Other"]}',@ItemName='{e["ItemName"]}',@Warrantydate='{e["warrantydate"]}',@Processs='{e["CPUCapacity"]}' ", util.strElect);
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Error processing item {i}: {ex.Message}");
-                        ModelState.AddModelError("", $"Error processing item {i + 1}: {ex.Message}");
-                        SetupViewBag();
-                        return View("Index", GetMaterialViewModel(model?.NewMaterial));
-                    }
+
+                    Id = "Matrial In SuccessFully";
                 }
 
-                material.MaterialItems = materialItems;
+                // Save the data to the database, etc.
 
-                // Handle custom names for Others
-                if (AssetItems.Find(material.AssetItemId)?.Name == "Others")
-                {
-                    material.CustomAssetName = model.NewMaterial.CustomAssetName;
-                }
-
-                // Handle Vendor
-                if (material.VendorId == othersVendor?.Id)
-                {
-                    material.CustomVendorName = form["NewMaterial.CustomVendorName"];
-                    _logger.LogInformation($"Setting custom vendor name: {material.CustomVendorName}");
-                }
-
-                // Handle Manufacturer
-                if (material.ManufacturerId == othersManufacturer?.Id)
-                {
-                    material.CustomManufacturerName = form["NewMaterial.CustomManufacturerName"];
-                    _logger.LogInformation($"Setting custom manufacturer name: {material.CustomManufacturerName}");
-                }
-
-                // Parse dates
-                if (!string.IsNullOrEmpty(Request.Form["BillDate"]))
-                {
-                    material.BillDate = ParseDate(Request.Form["BillDate"]) ?? DateTime.Now;
-                }
-
-                var receivedDate = ParseDate(Request.Form["ReceivedDate"]);
-                if (receivedDate.HasValue)
-                {
-                    material.RecordDate = receivedDate.Value;
-                }
-
-                // Add and save to database
-                _logger.LogInformation("Attempting to save to database...");
-                Materials.Add(material);
-                SaveChanges();
-
-                TempData["Success"] = "Material created successfully!";
-                _logger.LogInformation($"Successfully created material with ID: {material.Id}");
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, message = Id });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error creating material: {ex.Message}");
-                _logger.LogError($"Stack trace: {ex.StackTrace}");
-                ModelState.AddModelError("", $"Error saving to database: {ex.Message}");
-                SetupViewBag();
-                return View("Index", GetMaterialViewModel(model?.NewMaterial));
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }   [HttpPost]
+        public IActionResult MaterialOutInsert()
+        {
+            try
+            {
+                
+                string Companyid = Request.Form["Company"].ToString();
+                string branch = Request.Form["branch"].ToString();
+               
+                string Empid = Request.Form["employeeId"].ToString();
+                string Empname = Request.Form["EmployeeName"].ToString();
+                string Empemail = Request.Form["EmailId"].ToString();
+                string Empdpt = Request.Form["Department"].ToString();
+                string remark = Request.Form["Remarks"].ToString();
+                string Empphone = Request.Form["PhoneNo"].ToString();
+                string issrancedate = Request.Form["IssuanceDate"];
+
+                string JsonData = Request.Form["JsonData"].ToString();
+                var objects = JArray.Parse(JsonData);
+                string Id = "";
+                string Metrailno = "";
+                
+
+                
+
+                if (Id == "")
+                {
+                var ds = util.Fill(@$"exec Usp_MatrialOut @branch='{branch}',@Company='{Companyid}',@EmpId='{Empid}',@IssuanceDate='{issrancedate}',@remark='{remark}',@empName='{Empname}',@empDept='{Empdpt}',@empEmail='{Empemail}',@empPhone='{Empphone}' ", util.strElect);
+                   
+               int outid = Convert.ToInt32(ds.Tables[0].Rows[0][0].ToString());
+                    if (outid >0)
+                    {
+                        DataSet ds1 = new DataSet();
+                        foreach (var e in objects)
+                        {
+
+                            ds1 = util.Fill(@$"exec Usp_Assignment  @serailno='{e["serailno"]}', @WindowsKey='{e["windowskey"]}',@MSOfficeKey='{e["msofficekey"]}', @id='{outid}',@matreailId='{e["matreailId"]}' ", util.strElect);
+                        }
+
+                      
+
+                        Id = "Matrial Out SuccessFully";
+                    }
+                }
+                //if (Id == "")
+                //{
+                //    DataSet ds1 = new DataSet();
+                //    foreach(var e in objects)
+                //    {
+
+                //   ds1=util.Fill(@$"exec MatrialItems @Materialid='{Metrailno}',@Asstitemid='{e["AssetItemId"]}',@SerialNo='{e["SerialNo"]}',@Modelno='{e["ModelNo"]}',@Gen='{e["Generation"]}',@harddisk='{e["HardDisk"]}',@RamCap='{e["RAMCapacity"]}',@SSD='{e["SSDCapacity"]}',@Other='{e["Other"]}',@ItemName='{e["ItemName"]}',@Warrantydate='{e["warrantydate"]}',@Processs='{e["CPUCapacity"]}' ", util.strElect);
+                //    }
+
+                //    Id = "Matrial In SuccessFully";
+                //}
+
+                // Save the data to the database, etc.
+
+                return Json(new { success = true, message = Id });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
+
+
+        
+    
+
         private void SetupViewBag()
         {
-            ViewBag.Companies = new SelectList(Companies.Where(c=>c.Id==1).OrderBy(c => c.Name), "Id", "Name");
-            ViewBag.AssetItems = new SelectList(AssetItems.OrderBy(a => a.Name), "Id", "Name");
-            ViewBag.Vendors = new SelectList(Vendors.OrderBy(v => v.Name), "Id", "Name");
-            ViewBag.Manufacturers = new SelectList(Manufacturers.OrderBy(m => m.Name), "Id", "Name");
+            //ViewBag.Companies = new SelectList(Companies.Where(c=>c.Id==1).OrderBy(c => c.Name), "Id", "Name");
+          //  ViewBag.AssetItems = new SelectList(AssetItems.OrderBy(a => a.Name), "Id", "Name");
+          //  ViewBag.Vendors = new SelectList(Vendors.OrderBy(v => v.Name), "Id", "Name");
+          //  ViewBag.Manufacturers = new SelectList(Manufacturers.OrderBy(m => m.Name), "Id", "Name");
         }
 
         private MaterialViewModel GetMaterialViewModel(Material material = null)
         {
             try
             {
-                var materials = Materials
-                    .Include(m => m.Company)
-                    .Include(m => m.Vendor)
-                    .Include(m => m.Manufacturer)
-                    .Include(m => m.AssetItem)
-                    .Include(m => m.MaterialItems)
-                    .ToList() ?? new List<Material>();
+                //var materials = Materials
+                //    .Include(m => m.Company)
+                //    .Include(m => m.Vendor)
+                //    .Include(m => m.Manufacturer)
+                //    .Include(m => m.AssetItem)
+                //    .Include(m => m.MaterialItems)
+                //    .ToList() ?? new List<Material>();
 
                 return new MaterialViewModel
                 {
-                    Materials = materials,
+                  //  Materials = materials,
                     NewMaterial = material ?? new Material
                     {
-                        CompanyId = Companies.FirstOrDefault()?.Id ?? 0
+                      //  CompanyId = Companies.FirstOrDefault()?.Id ?? 0
                     }
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in GetMaterialViewModel: {ex.Message}");
+                //_logger.LogError($"Error in GetMaterialViewModel: {ex.Message}");
                 return new MaterialViewModel
                 {
                     Materials = new List<Material>(),
@@ -461,122 +277,71 @@ namespace ContentManagementSystem.Controllers
         {
             try
             {
-                DateTime? fromDate = null;
-                DateTime? toDate = null;
+                string fromDate = "";
+                string toDate = "";
 
                 if (!string.IsNullOrEmpty(receivedDateFrom))
                 {
-                    DateTime.TryParseExact(receivedDateFrom, "dd/MM/yyyy",
-                        CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedFromDate);
-                    fromDate = parsedFromDate;
+                    fromDate = DateTime.ParseExact(receivedDateFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
                 }
 
                 if (!string.IsNullOrEmpty(receivedDateTo))
                 {
-                    DateTime.TryParseExact(receivedDateTo, "dd/MM/yyyy",
-                        CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedToDate);
-                    toDate = parsedToDate;
+                     toDate = DateTime.ParseExact(receivedDateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
                 }
 
-                // JOIN query: Materials + MaterialItems + AssetItems
-                var query =
-                    from m in Materials
-                    join mi in MaterialItems
-                        on m.Id equals mi.MaterialId
-                    join ai in AssetItems
-                        on mi.AssetItemId equals ai.Id into aiGroup
-                    from ai in aiGroup.DefaultIfEmpty() // left join for AssetItem (optional)
-                    where mi.Status == "UnAssigned"
-                    select new
+
+                var ds = util.Fill("exec Usp_AvailableStock @fromdate='" + fromDate + "',@todate='"+toDate+"'", util.strElect);
+                var dt = ds.Tables[0];
+
+                List<MaterialItem> materialItems = new List<MaterialItem>();
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    MaterialItem item = new MaterialItem
                     {
-                        Material = m,
-                        MaterialItem = mi,
-                        AssetItem = ai
+                       
+                        InvoiceNo = dr["InvoiceNo"].ToString(),
+                        SerialNo = dr["SerialNo"].ToString(),
+                        ModelNo = dr["ModelNo"].ToString(),
+                        Vendor = dr["vendor"].ToString(),
+                        BillDate = dr["BillDate"].ToString(),
+                        RecordDate = dr["RecordDate"].ToString(),
+                        Manufacturer = dr["manufuture"].ToString(),
+                        ItemName = dr["ItemName"].ToString(),
+                        CustomVendorName = dr["CustomVendorName"].ToString(),
+                        CustomAssetName = dr["CustomAssetName"].ToString(),
+                        CustomManufacturerName = dr["CustomManufacturerName"].ToString(),
+                        AssetItem = dr["AssetItem"].ToString(),
+                        Generation = dr["Generation"].ToString(),
+                        CPUCapacity = dr["CPUCapacity"].ToString(),
+                        HardDisk = dr["HardDisk"].ToString(),
+                        RAMCapacity = dr["RAMCapacity"].ToString(),
+                        SSDCapacity = dr["SSDCapacity"].ToString(),
+                        Other = dr["Other"].ToString(),
+                        WarrantyDate = dr["WarrantyDate"] != DBNull.Value ? Convert.ToDateTime(dr["WarrantyDate"]) : (DateTime?)null,
+                        Status = dr["Status"] != DBNull.Value ? Convert.ToString(dr["Status"]) : string.Empty
                     };
 
-                // Apply search term
-                if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    searchTerm = searchTerm.ToLower();
-
-                    query = query.Where(x =>
-                        x.Material.InvoiceNo.ToLower().Contains(searchTerm) ||
-                        (x.Material.AssetItem.Name == "Others" && !string.IsNullOrEmpty(x.Material.CustomAssetName) && x.Material.CustomAssetName.ToLower().Contains(searchTerm)) ||
-                        (x.Material.Vendor.Name == "Others" && !string.IsNullOrEmpty(x.Material.CustomVendorName) && x.Material.CustomVendorName.ToLower().Contains(searchTerm)) ||
-                        (x.Material.Manufacturer.Name == "Others" && !string.IsNullOrEmpty(x.Material.CustomManufacturerName) && x.Material.CustomManufacturerName.ToLower().Contains(searchTerm)) ||
-                        x.Material.AssetItem.Name.ToLower().Contains(searchTerm) ||
-                        x.Material.Vendor.Name.ToLower().Contains(searchTerm) ||
-                        x.Material.Manufacturer.Name.ToLower().Contains(searchTerm)
-                    );
+                    materialItems.Add(item);
                 }
 
-                // Apply date filters
-                if (fromDate.HasValue)
+               
+             
+           
+
+                var viewModel = new AvailableStockViewModel
                 {
-                    query = query.Where(x => x.Material.RecordDate.Date >= fromDate.Value.Date);
-                }
-
-                if (toDate.HasValue)
-                {
-                    query = query.Where(x => x.Material.RecordDate.Date <= toDate.Value.Date);
-                }
-
-                // Group by Material to build a list of MaterialItems per Material
-                var groupedResults = query
-                    .AsEnumerable() // Switch to LINQ-to-Objects
-                    .GroupBy(x => x.Material)
-                    .Select(g => new Material
-                    {
-                        Id = g.Key.Id,
-                        InvoiceNo = g.Key.InvoiceNo,
-                        Vendor = g.Key.Vendor,
-                        AssetItem=g.Key.AssetItem,
-                        Manufacturer = g.Key.Manufacturer,
-                        CustomAssetName = g.Key.CustomAssetName,
-                        CustomVendorName = g.Key.CustomVendorName,
-                        CustomManufacturerName = g.Key.CustomManufacturerName,
-                        BillDate = g.Key.BillDate,
-                        RecordDate = g.Key.RecordDate,
-
-                        // Join + group to get distinct AssetItem names from MaterialItems
-                      
-
-                        // MaterialItems list (project with string conversions)
-                        MaterialItems = g.Select(x => new MaterialItem
-                        {
-                            Id = x.MaterialItem.Id,
-                            SerialNo = x.MaterialItem.SerialNo,
-                            ModelNo = x.MaterialItem.ModelNo,
-                            ItemName = x.MaterialItem.ItemName,
-                            AssetItem = x.AssetItem,
-                            Generation = x.MaterialItem.Generation?.ToString() ?? string.Empty,
-                            CPUCapacity = x.MaterialItem.CPUCapacity?.ToString() ?? string.Empty,
-                            HardDisk = x.MaterialItem.HardDisk?.ToString() ?? string.Empty,
-                            RAMCapacity = x.MaterialItem.RAMCapacity?.ToString() ?? string.Empty,
-                            SSDCapacity = x.MaterialItem.SSDCapacity?.ToString() ?? string.Empty,
-                            Other = x.MaterialItem.Other,
-                            WarrantyDate = x.MaterialItem.WarrantyDate,
-                            Status = x.MaterialItem.Status,
-                            AssetItemId = x.MaterialItem.AssetItemId
-                        }).ToList()
-                    })
-                    .ToList();
-
-                var model = new AvailableStockViewModel
-                {
-                    SearchTerm = searchTerm,
-                    ReceivedDateFrom = fromDate,
-                    ReceivedDateTo = toDate,
-                    Materials = groupedResults
+                    Materials = materialItems
                 };
 
-                ViewBag.ShowSidebar = true;
+               
 
-                return View(model);
+                return View(viewModel);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in AvailableStock: {ex.Message}");
+               // _logger.LogError($"Error in AvailableStock: {ex.Message}");
                 return View("Error");
             }
         }
@@ -586,41 +351,41 @@ namespace ContentManagementSystem.Controllers
             DateTime? billDateFrom, DateTime? billDateTo,
             DateTime? warrantyDateFrom, DateTime? warrantyDateTo)
         {
-            var query = MaterialItems
-                .Include(mi => mi.Material)
-                    .ThenInclude(m => m.AssetItem)
-                .Where(mi => mi.Status == "UnAssigned");
+            //var query = MaterialItems
+            //    .Include(mi => mi.Material)
+            //        .ThenInclude(m => m.AssetItem)
+            //    .Where(mi => mi.Status == "UnAssigned");
 
             // Apply search filter
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 searchTerm = searchTerm.ToLower();
-                query = query.Where(mi =>
-                    (mi.Material.AssetItem.Name == "Others" && mi.ItemName.ToLower().Contains(searchTerm)) ||
-                    (mi.Material.AssetItem.Name != "Others" && mi.Material.AssetItem.Name.ToLower().Contains(searchTerm)) ||
-                    mi.SerialNo.ToLower().Contains(searchTerm) ||
-                    mi.ModelNo.ToLower().Contains(searchTerm)
-                );
+                //query = query.Where(mi =>
+                //    (mi.Material.AssetItem.Name == "Others" && mi.ItemName.ToLower().Contains(searchTerm)) ||
+                //    (mi.Material.AssetItem.Name != "Others" && mi.Material.AssetItem.Name.ToLower().Contains(searchTerm)) ||
+                //    mi.SerialNo.ToLower().Contains(searchTerm) ||
+                //    mi.ModelNo.ToLower().Contains(searchTerm)
+                //);
             }
 
             // Apply Bill Date filters
             if (billDateFrom.HasValue)
             {
-                query = query.Where(mi => mi.Material.BillDate >= billDateFrom.Value);
+                //query = query.Where(mi => mi.Material.BillDate >= billDateFrom.Value);
             }
             if (billDateTo.HasValue)
             {
-                query = query.Where(mi => mi.Material.BillDate <= billDateTo.Value);
+                //query = query.Where(mi => mi.Material.BillDate <= billDateTo.Value);
             }
 
             // Apply Warranty Date filters
             if (warrantyDateFrom.HasValue)
             {
-                query = query.Where(mi => mi.WarrantyDate >= warrantyDateFrom.Value);
+                //query = query.Where(mi => mi.WarrantyDate >= warrantyDateFrom.Value);
             }
             if (warrantyDateTo.HasValue)
             {
-                query = query.Where(mi => mi.WarrantyDate <= warrantyDateTo.Value);
+                //query = query.Where(mi => mi.WarrantyDate <= warrantyDateTo.Value);
             }
 
             var model = new AvailableItemViewModel
@@ -630,79 +395,145 @@ namespace ContentManagementSystem.Controllers
                 BillDateTo = billDateTo,
                 WarrantyDateFrom = warrantyDateFrom,
                 WarrantyDateTo = warrantyDateTo,
-                AvailableItems = query.ToList()
+                //AvailableItems = query.ToList()
             };
 
             return View(model);
         }
 
-        public IActionResult InvoiceDashboard()
+        public IActionResult InvoiceDashboard(string BillDatefrom, string BillDateto, string receivedDateFrom,string receivedDateTo)
         {
             try
             {
-                var materials = Materials
-                    .Include(m => m.Company)
-                    .Include(m => m.AssetItem)
-                    .Include(m => m.Vendor)
-                    .Include(m => m.Manufacturer)
-                    .Include(m => m.MaterialItems)
-                    .OrderByDescending(m => m.BillDate)
-                    .ToList();
+                string receivedFrom = "";
+                string receivedto = "";
+                string Billfrom = "";
+                string Billto = "";
+
+                if (!string.IsNullOrEmpty(receivedDateFrom))
+                {
+                    receivedFrom = DateTime.ParseExact(receivedDateFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                }
+
+                if (!string.IsNullOrEmpty(receivedDateTo))
+                {
+                    receivedto = DateTime.ParseExact(receivedDateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                }
+
+                if (!string.IsNullOrEmpty(BillDatefrom))
+                {
+                    Billfrom = DateTime.ParseExact(BillDatefrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                }
+
+                if (!string.IsNullOrEmpty(BillDateto))
+                {
+                    Billto = DateTime.ParseExact(BillDateto, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                }
+
+
+                var ds = util.Fill("exec InvoiceRecord @fromdate='"+Billfrom+"',@todate='"+Billto+"',@rfromdate='"+receivedFrom+"',@rtodate='"+receivedto+"'", util.strElect);
+                var dt = ds.Tables[0];
+                List<Material> materialItems = new List<Material>();
+  foreach(DataRow dr in dt.Rows)
+                {
+
+
+                    Material Item = new Material
+                    {
+                        Id = dr["Id"].ToString(),
+                        InvoiceNo = dr["InvoiceNo"].ToString(),
+                        AssetItem = dr["AssetItem"].ToString(),
+                        Vendor = dr["Vendor"].ToString(),
+                        Company = dr["company"].ToString(),
+                        Manufacturer = dr["Manufacturer"].ToString(),
+                        BillDate = dr["BillDate"].ToString(),
+                        RecordDate = dr["RecordDate"].ToString(),
+                        ImagePath = dr["ImagePath"].ToString(),
+                        TotalItem = dr["TotalItem"].ToString(),
+                        
+                    };
+                materialItems.Add(Item);
+
+
+                }
+
 
                 var model = new MaterialViewModel
                 {
-                    Materials = materials
+                    Materials = materialItems
                 };
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in InvoiceDashboard: {ex.Message}");
+                //_logger.LogError($"Error in InvoiceDashboard: {ex.Message}");
                 return View("Error");
             }
         }
 
-        public IActionResult AssignedAssets()
+        public IActionResult AssignedAssets(string issuanceDateFrom, string issuanceDateTo)
         {
             try
-            {
-                var assignedAssets = MaterialAssignments
-                    .Include(ma => ma.MaterialOut)
-                        .ThenInclude(mo => mo.Company)
-                    .Include(ma => ma.MaterialOut)
-                        .ThenInclude(mo => mo.Branch)
-                    .Include(ma => ma.MaterialItem)
-                        .ThenInclude(mi => mi.AssetItem)
-                    .Include(ma => ma.Employee)
-                    .Select(ma => new AssignedAssetItem
-                    {
-                        MaterialOutId = ma.MaterialOutId,
-                        IssuanceDate = ma.AssignmentDate,
-                        CompanyName = ma.MaterialOut.Company.Name,
-                        BranchName = ma.MaterialOut.Branch.Name,
-                        EmployeeId = ma.EmployeeNumber,
-                        EmployeeName = ma.Employee.Name,
-                        Department = ma.Employee.Department,
-                        AssetName = ma.MaterialItem.AssetItem.Name,
-                        SerialNo = ma.MaterialItem.SerialNo,
-                        ModelNo = ma.MaterialItem.ModelNo,
-                        WarrantyDate = ma.MaterialItem.WarrantyDate,
-                        Status = ma.MaterialItem.Status
-                    })
-                    .OrderByDescending(a => a.IssuanceDate)
-                    .ToList();
 
+            {
+                string fromDate = "";
+                string toDate = "";
+
+                if (!string.IsNullOrEmpty(issuanceDateFrom))
+                {
+                    fromDate = DateTime.ParseExact(issuanceDateFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                }
+
+                if (!string.IsNullOrEmpty(issuanceDateTo))
+                {
+                    toDate = DateTime.ParseExact(issuanceDateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                }
+
+
+                var ds = util.Fill("exec AssignedAssets @fromdate='"+fromDate+ "',@todate='"+toDate+"'", util.strElect);
+                var dt = ds.Tables[0];
+
+
+
+                List<AssignedAssetItem> materialItems = new List<AssignedAssetItem>();
+
+                 foreach (DataRow dr in dt.Rows)
+                 {
+                    AssignedAssetItem Item  = new AssignedAssetItem
+                    {
+
+
+                         //MaterialOutId = dr["InvoiceNo"] != DBNull.Value ? dr["InvoiceNo"].ToString() : string.Empty,
+                         IssuanceDate = dr["IssuanceDate"] != DBNull.Value ? dr["IssuanceDate"].ToString() : string.Empty,
+                         CompanyName = dr["company"] != DBNull.Value ? dr["company"].ToString() : string.Empty,
+                         BranchName = dr["branch"] != DBNull.Value ? dr["branch"].ToString() : string.Empty,
+                         EmployeeId = dr["EmployeeNumber"] != DBNull.Value ? dr["EmployeeNumber"].ToString() : string.Empty,
+                         EmployeeName = dr["Employee"] != DBNull.Value ? dr["Employee"].ToString() : string.Empty,
+                         Department = dr["Department"] != DBNull.Value ? dr["Department"].ToString() : string.Empty,
+                         AssetName = dr["AssetItem"] != DBNull.Value ? dr["AssetItem"].ToString() : string.Empty,
+                         SerialNo = dr["SerialNo"] != DBNull.Value ? dr["SerialNo"].ToString() : string.Empty,
+                         ModelNo = dr["ModelNo"] != DBNull.Value ? dr["ModelNo"].ToString() : string.Empty,
+                         WarrantyDate = dr["WarrantyDate"] != DBNull.Value ? dr["WarrantyDate"].ToString() : string.Empty,
+                         Status = dr["Status"] != DBNull.Value ? dr["Status"].ToString() : string.Empty,
+
+                     };
+
+                     materialItems.Add(Item);
+                 }
+              
+
+             
                 var viewModel = new AssignedAssetsViewModel
                 {
-                    AssignedAssets = assignedAssets
+                    AssignedAssets = materialItems
                 };
 
                 return View(viewModel);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in AssignedAssets: {ex.Message}");
+               // _logger.LogError($"Error in AssignedAssets: {ex.Message}");
                 return View("Error");
             }
         }
@@ -715,45 +546,17 @@ namespace ContentManagementSystem.Controllers
         {
             try
             {
-                // Ensure we have at least one company
-                if (!Companies.Any())
-                {
-                    Companies.Add(new Company { Name = "ASP Securities" });
-                    SaveChanges();
-                }
 
-                // Get all companies and assets
-                var companies = Companies.ToList();
-                var firstCompany = companies.FirstOrDefault();
-                var assets = AssetItems.ToList();
+                ViewBag.Companies = util.PopulateDropDown("select * from Companies", util.strElect);
+                ViewBag.Employee = util.PopulateDropDown("select employeeid as Id,(name +' ('+employeeid+')')as Name from Employees", util.strElect);
+                ViewBag.AssetItems = util.PopulateDropDown("select * from AssetItems", util.strElect);
 
-                var model = new MaterialOutViewModel
-                {
-                    CompanyId = firstCompany?.Id ?? 1,  // Set default CompanyId
-                    IssuanceDate = DateTime.Today  // Set default date to today
-                };
 
-                // Setup ViewBag
-                ViewBag.Companies = new SelectList(companies, "Id", "Name", firstCompany?.Id);
-                ViewBag.Assets = new SelectList(assets, "Id", "Name");
-
-                // Get initial branches for the default company
-                var branches = Branches
-                    .Where(b => b.CompanyId == model.CompanyId)
-                    .Select(b => new
-                    {
-                        id = b.Id.ToString(),
-                        text = b.Name
-                    })
-                    .ToList();
-
-                ViewBag.InitialBranches = branches;
-
-                return View(model);
+                return View();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in MaterialOut action: {ex.Message}");
+              //  _logger.LogError($"Error in MaterialOut action: {ex.Message}");
                 return View("Error");
             }
         }
@@ -761,66 +564,112 @@ namespace ContentManagementSystem.Controllers
         [HttpGet]
         public JsonResult GetEmployeeDetails(string empId)
         {
-            var employee = Employees.FirstOrDefault(e => e.EmployeeId == empId);
-            if (employee == null)
-                return Json(new { });
+            var ds = util.Fill("select Name, Department, Email, PhoneNo from Employees where EmployeeId = '"+ empId + "'", util.strElect);
 
-            return Json(new
-            {
-                name = employee.Name,
-                department = employee.Department,
-                email = employee.Email,
-                phoneNo = employee.PhoneNo
-            });
+            var dt = ds.Tables[0];
+            return Json(JsonConvert.SerializeObject(dt));
+
+        }  
+        [HttpGet]
+        public JsonResult GetMaterialItems(string materialId)
+        {
+            var ds = util.Fill("exec GetMaterialItems @martialid='"+ materialId + "'", util.strElect);
+
+            var dt = ds.Tables[0];
+
+            List<MaterialItem> materialItems = new List<MaterialItem>();
+
+
+            MaterialItem Item = new MaterialItem
+                {
+                   // Id = dt.Rows[0]["Id"].ToString(),
+                    SerialNo = dt.Rows[0]["SerialNo"].ToString(),
+                    ModelNo = dt.Rows[0]["ModelNo"].ToString(),
+                    Generation = dt.Rows[0]["Generation"].ToString(),
+                    CPUCapacity = dt.Rows[0]["Processor"].ToString(),
+                    RAMCapacity = dt.Rows[0]["RAMCapacity"].ToString(),
+                    SSDCapacity = dt.Rows[0]["SSDCapacity"].ToString(),
+                    HardDisk = dt.Rows[0]["HardDisk"].ToString(),
+                    Other = dt.Rows[0]["Other"].ToString(),
+                    WarrantyDate = Convert.ToDateTime(dt.Rows[0]["WarrantyDate"])
+
+                };
+
+               
+            
+           // return Json(Item);
+            return Json(JsonConvert.SerializeObject(dt));
+
         }
 
         [HttpGet]
-        public JsonResult GetBranches(string search = null, int? companyId = null)
+        public JsonResult GetBranches(string? companyId)
         {
             try
             {
-                var query = Branches
-                    .Include(b => b.Company)
-                    .AsQueryable();
+                var ds = util.PopulateDropDown("select Id,Name from Branches where CompanyId='" + companyId + "'",util.strElect);
 
-                // Filter by company if provided
-                if (companyId.HasValue)
-                {
-                    query = query.Where(b => b.CompanyId == companyId);
-                }
 
-                // Apply search filter if provided
-                if (!string.IsNullOrEmpty(search))
-                {
-                    search = search.ToLower();
-                    query = query.Where(b => b.Name.ToLower().Contains(search));
-                }
 
-                // First get the data
-                var branchData = query
-                    .Select(b => new
-                    {
-                        Branch = b,
-                        CompanyName = b.Company.Name
-                    })
-                    .ToList();  // Execute query here
-
-                // Then format the display text
-                var branches = branchData
-                    .Select(b => new
-                    {
-                        id = b.Branch.Id.ToString(),
-                        text = $"{b.Branch.Name} ({b.CompanyName})"
-                    })
-                    .OrderBy(b => b.text)
-                    .Take(20)
-                    .ToList();
-
-                return Json(branches);
+                return Json(JsonConvert.SerializeObject(ds));
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting branches: {ex.Message}");
+               // _logger.LogError($"Error getting branches: {ex.Message}");
+                return Json(new object[] { });
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetSearilNO(string? assentid)
+        {
+            try
+            {
+                var ds = util.PopulateDropDown("select Id,serialNo from MaterialItems where assetitemid='" + assentid + "'and status ='UnAssigned'", util.strElect);
+
+
+
+                return Json(JsonConvert.SerializeObject(ds));
+            }
+            catch (Exception ex)
+            {
+               // _logger.LogError($"Error getting branches: {ex.Message}");
+                return Json(new object[] { });
+            }
+        }
+        [HttpGet]
+        public JsonResult GetoutDetails(string? serialid)
+        {
+            try
+            {
+                var ds = util.Fill("exec Usp_GetMaterialOutItems @martialid='" + serialid+"'", util.strElect);
+                
+
+
+
+                return Json(JsonConvert.SerializeObject(ds.Tables[0]));
+            }
+            catch (Exception ex)
+            {
+               // _logger.LogError($"Error getting branches: {ex.Message}");
+                return Json(new object[] { });
+            }
+        } 
+        [HttpGet]
+        public JsonResult bindassent()
+        {
+            try
+            {
+                var ds = util.PopulateDropDown("select * from AssetItems", util.strElect);
+                
+
+
+
+                return Json(JsonConvert.SerializeObject(ds));
+            }
+            catch (Exception ex)
+            {
+               // _logger.LogError($"Error getting branches: {ex.Message}");
                 return Json(new object[] { });
             }
         }
@@ -843,12 +692,32 @@ namespace ContentManagementSystem.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAvailableSerialNumbers(int assetId, string search = "")
+        public JsonResult GetAvailableSerialNumbers(int assetId)
         {
-           
+           /* var items = _db.MaterialItems
+                .Include(mi => mi.AssetItem)
+                .Where(mi => mi.AssetItemId == assetId && mi.Status == "UnAssigned")
+                .Select(mi => new
+                {
+                    serialNo = mi.SerialNo,
+                    modelNo = mi.ModelNo,
+                    generation = mi.Generation,
+                    cpuCapacity = mi.CPUCapacity,
+                    ramCapacity = mi.RAMCapacity,
+                    hardDisk = mi.HardDisk,
+                    ssdCapacity = mi.SSDCapacity,
+                    windowsKey = mi.WindowsKey,
+                    msOfficeKey = mi.MSOfficeKey,
+                    warrantyDate = mi.WarrantyDate,
+                    other = mi.Other
+                });
 
-           
+            if (!string.IsNullOrEmpty(search))
+            {
+                items = items.Where(i => i.serialNo.Contains(search));
+            }*/
 
+           // return Json(items.Take(10).ToList());
             return Json(0);
         }
 
@@ -877,7 +746,7 @@ namespace ContentManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error in CreateMaterialOut: {ex.Message}");
+               // _logger.LogError($"Error in CreateMaterialOut: {ex.Message}");
                 return View("Error");
             }
         }
@@ -918,7 +787,7 @@ namespace ContentManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error creating branch: {ex.Message}");
+               // _logger.LogError($"Error creating branch: {ex.Message}");
                 return Json(new { success = false, message = "Error creating branch" });
             }
         }

@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +15,11 @@ namespace ContentManagementSystem.Models
         public Material()
         {
             MaterialItems = new List<MaterialItem>();
-            RecordDate = DateTime.Now;  // Set default value
+           // RecordDate = DateTime.Now;  // Set default value
         }
 
         
-        public int Id { get; set; }
+        public string Id { get; set; }
         
         [Required]
         public int CompanyId { get; set; }
@@ -49,10 +49,10 @@ namespace ContentManagementSystem.Models
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         [ModelBinder(BinderType = typeof(CustomDateTimeModelBinder))]
-        public DateTime BillDate 
+        public string BillDate 
         { 
-            get => _billDate;
-            set => _billDate = value;
+            get;
+            set ;
         }
         
         [NotMapped]
@@ -79,15 +79,20 @@ namespace ContentManagementSystem.Models
         public string ImagePath { get; set; }
         public string Month { get; set; }
         public string Year { get; set; }
-        public DateTime RecordDate { get; set; }
+        public string RecordDate { get; set; }
 
         // Navigation properties
-        public virtual Company Company { get; set; }
-        public virtual AssetItem AssetItem { get; set; }
-        public virtual Vendor Vendor { get; set; }
-        public virtual Manufacturer Manufacturer { get; set; }
+        public string Company { get; set; }
+        public string AssetItem { get; set; }
+        public string Vendor { get; set; }
+        public string Manufacturer { get; set; }
+        public string TotalItem { get; set; }
         public virtual ICollection<MaterialItem> MaterialItems { get; set; }
     }
+
+
+    
+
 
     /*
     public class MaterialItem

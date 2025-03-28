@@ -69,7 +69,7 @@
                             @foreach (var asset in Model.AssignedAssets)
                             {
                                 <tr>
-                                    <td>@asset.IssuanceDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@asset.IssuanceDate</td>
                                     <td>@asset.CompanyName</td>
                                     <td>@asset.BranchName</td>
                                     <td>@asset.EmployeeId</td>
@@ -78,7 +78,7 @@
                                     <td>@asset.AssetName</td>
                                     <td>@asset.SerialNo</td>
                                     <td>@asset.ModelNo</td>
-                                    <td>@(asset.WarrantyDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                    <td>@(asset.WarrantyDate ?? "-")</td>
                                     <td>
                                         <span class="badge bg-success">@asset.Status</span>
                                     </td>
@@ -109,7 +109,7 @@
                             @foreach (var asset in Model.AssignedAssets)
                             {
                                 <tr>
-                                    <td>@asset.IssuanceDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@asset.IssuanceDate</td>
                                     <td>@asset.CompanyName</td>
                                     <td>@asset.BranchName</td>
                                     <td>@asset.EmployeeId</td>
@@ -118,7 +118,7 @@
                                     <td>@asset.AssetName</td>
                                     <td>@asset.SerialNo</td>
                                     <td>@asset.ModelNo</td>
-                                    <td>@(asset.WarrantyDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                    <td>@(asset.WarrantyDate ?? "-")</td>
                                     <td>
                                         <span class="badge bg-success">@asset.Status</span>
                                     </td>
