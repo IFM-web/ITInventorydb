@@ -10,8 +10,8 @@
         @await Html.PartialAsync("_Sidebar")
 
         <!-- Main content -->
-        <div class="col-md-10">
-            <div class="container mt-4">
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
                 <h2>Available Stock</h2>
 
                 <!-- Search Form -->
@@ -21,29 +21,23 @@
                         <div class="col-md-3">
                             <label>Received From Date</label>
                             <div class="input-group">
-                                <input type="text" 
+                                <input type="date" 
                                        name="receivedDateFrom" 
-                                       class="form-control date-picker" 
+                                       class="form-control" 
                                        placeholder="Received From Date"
-                                       value="@(Model.ReceivedDateFrom?.ToString("dd/MM/yyyy"))" 
-                                       autocomplete="off" />
-                                <span class="input-group-text">
-                                    <i class="fas fa-calendar"></i>
-                                </span>
+                                       />
+                           
                             </div>
                         </div>
                         <div class="col-md-3">
                             <label>Received To Date</label>
                             <div class="input-group">
-                                <input type="text" 
+                                <input type="date" 
                                        name="receivedDateTo" 
-                                       class="form-control date-picker" 
+                                       class="form-control" 
                                        placeholder="Received To Date"
-                                       value="@(Model.ReceivedDateTo?.ToString("dd/MM/yyyy"))" 
-                                       autocomplete="off" />
-                                <span class="input-group-text">
-                                    <i class="fas fa-calendar"></i>
-                                </span>
+                                      />
+                               
                             </div>
                         </div>
                         <div class="col-md-4" style="margin-top:24px;">
@@ -84,22 +78,17 @@
                                         <td>
                                             @if (item.AssetItem == "Others")
                                             {
-                                            @(item.CustomAssetName)
-                                        }
+                                            @(item.CustomAssetName ?? item.AssetItem)
+                                            }
                                             else
                                             {
                                             @(item.AssetItem??item.CustomAssetName)
                                         }
                                         </td>
                                         <td>
-                                            @if (item.Vendor == "Others")
-                                            {
-                                            @(item.CustomVendorName)
-                                            }
-                                            else
-                                            {
+                                           
                                             @(item.Vendor ?? item.CustomVendorName)
-                                            }
+                                            
                                         </td>
                                         <td>
                                             @if (item.Manufacturer == "Others")
@@ -182,16 +171,24 @@
                                         <td>@i</td>
                             <td>@item.InvoiceNo</td>
                                         <td>
-                                    @(item.CustomAssetName ?? item.AssetItem)
+                                    @if (item.AssetItem == "Others")
+                                    {
+                                        @(item.ItemName ?? item.CustomAssetName)
+                                    }
+                                    else
+
+                                    {
+                                        @(item.AssetItem ?? "-")
+                                    
+                                    }
+
 
                                 </td>
 
                                 <td>
-                                    @(item.CustomVendorName!=""){
-                                    @(item.CustomVendorName)
-                                    }else{
-                                    @item.Vendor
-                                    }
+                                   
+                                    @(item.Vendor?? item.CustomVendorName ?? "-")
+                                    
                               
                                 </td>
 
@@ -320,18 +317,7 @@
     }
 
         $(document).ready(function() {
-            // Initialize datepickers
-            $('input[name="receivedDateFrom"], input[name="receivedDateTo"]').datepicker({
-                format: 'dd/mm/yyyy',
-                autoclose: true,
-                todayHighlight: true,
-                clearBtn: true
-            });
-
-            // Update the search form
-            $('.date-picker').on('changeDate', function() {
-                $(this).datepicker('hide');
-            });
+           
 
             $('#availableStockTable').DataTable({
                 order: [[0, 'desc']],

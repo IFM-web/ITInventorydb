@@ -37,6 +37,29 @@
                     Invoice Record
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UpdateMaterialItem" ? "active" : "")"
+                   href="@Url.Action("UpdateMaterialItem", "Material")">
+                    @* <i class="fas fa-tachometer-alt"></i>  *@
+                    Modify Material
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UpdateInvoice" ? "active" : "")"
+                   href="@Url.Action("UpdateInvoice", "Material")">
+                    @* <i class="fas fa-tachometer-alt"></i>  *@
+                    Update Invoice
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AssetAssignmentDetails" ? "active" : "")"
+                   href="@Url.Action("AssetAssignmentDetails", "Material")">
+                    @* <i class="fas fa-tachometer-alt"></i>  *@
+                    Asset Assignment Details
+                </a>
+            </li>
         </ul>
     </div>
 </div>
+
+

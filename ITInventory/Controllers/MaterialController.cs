@@ -18,9 +18,12 @@ using System.Data;
 using System.Text.Json.Nodes;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using static ContentManagementSystem.Filters.AuthenticationFilter;
+using ContentManagementSystem.Filters;
 
 namespace ContentManagementSystem.Controllers
 {
+    [AuthenticationFilter]
     public class MaterialController : Controller
     {
        db_Utility util=new db_Utility();
@@ -90,16 +93,18 @@ namespace ContentManagementSystem.Controllers
                 string customVendorName = Request.Form["customVendorName"].ToString();
                 string Manufacturer = Request.Form["Manufacturer"].ToString();
                 string customManufacturerName = Request.Form["customManufacturerName"].ToString();
-                string BillDate = DateTime.ParseExact(Request.Form["BillDate"], "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                string BillDate = Request.Form["BillDate"].ToString();
+               
 
                 
                 string ReceivedDate = Request.Form["ReceivedDate"].ToString();
                 string reqnQuantity = Request.Form["reqnQuantity"].ToString();
-                string invoiceUpload = Request.Form["files"];
+                //string invoiceUpload = Request.Form["FileName"].ToString();
                 string JsonData = Request.Form["JsonData"].ToString();
                 var objects = JArray.Parse(JsonData);
                 string Id = "";
                 string Metrailno = "";
+                string fileName = "";
                 foreach (var e in objects)
                 {
                     var ds2 = util.Fill(@$"exec ChekcSerailNo @SerialNo='{e["SerialNo"]}' ", util.strElect);
@@ -123,6 +128,7 @@ namespace ContentManagementSystem.Controllers
 
                     string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    fileName = "uploads/"+uniqueFileName;
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
@@ -134,7 +140,7 @@ namespace ContentManagementSystem.Controllers
 
                 if (Id == "")
                 {
-                var ds = util.Fill(@$"exec MatrialInMaster @Invoiceno='{Invoice}',@Company='{Companyid}',@assetitem='{AssetItem}',@cusassetname='{customAssetName}',@vendor='{Vendor}',@cusvendorname='{customVendorName}',@manufacture='{Manufacturer}',@cusmanufacture='{customManufacturerName}',@billdate='{BillDate}',@Receiveddate='{ReceivedDate}',@reciveqty='{reqnQuantity}',@InvoiceImg='{invoiceUpload}' ", util.strElect);
+                var ds = util.Fill(@$"exec MatrialInMaster @Invoiceno='{Invoice}',@Company='{Companyid}',@assetitem='{AssetItem}',@cusassetname='{customAssetName}',@vendor='{Vendor}',@cusvendorname='{customVendorName}',@manufacture='{Manufacturer}',@cusmanufacture='{customManufacturerName}',@billdate='{BillDate}',@Receiveddate='{ReceivedDate}',@reciveqty='{reqnQuantity}',@InvoiceImg='{fileName}' ", util.strElect);
                    
                 Id = ds.Tables[0].Rows[0][0].ToString();
                     if (Id != "Invoice No Exist")
@@ -188,8 +194,6 @@ namespace ContentManagementSystem.Controllers
 
                 
 
-                if (Id == "")
-                {
                 var ds = util.Fill(@$"exec Usp_MatrialOut @branch='{branch}',@Company='{Companyid}',@EmpId='{Empid}',@IssuanceDate='{issrancedate}',@remark='{remark}',@empName='{Empname}',@empDept='{Empdpt}',@empEmail='{Empemail}',@empPhone='{Empphone}' ", util.strElect);
                    
                int outid = Convert.ToInt32(ds.Tables[0].Rows[0][0].ToString());
@@ -199,14 +203,81 @@ namespace ContentManagementSystem.Controllers
                         foreach (var e in objects)
                         {
 
-                            ds1 = util.Fill(@$"exec Usp_Assignment  @serailno='{e["serailno"]}', @WindowsKey='{e["windowskey"]}',@MSOfficeKey='{e["msofficekey"]}', @id='{outid}',@matreailId='{e["matreailId"]}' ", util.strElect);
+                            ds1 = util.Fill(@$"exec Usp_Assignment @EmpId='{Empid}' ,@serailno='{e["serailno"]}', @WindowsKey='{e["windowskey"]}',@MSOfficeKey='{e["msofficekey"]}', @id='{outid}',@matreailId='{e["matreailId"]}' ", util.strElect);
                         }
 
                       
 
                         Id = "Matrial Out SuccessFully";
                     }
+                
+                //if (Id == "")
+                //{
+                //    DataSet ds1 = new DataSet();
+                //    foreach(var e in objects)
+                //    {
+
+                //   ds1=util.Fill(@$"exec MatrialItems @Materialid='{Metrailno}',@Asstitemid='{e["AssetItemId"]}',@SerialNo='{e["SerialNo"]}',@Modelno='{e["ModelNo"]}',@Gen='{e["Generation"]}',@harddisk='{e["HardDisk"]}',@RamCap='{e["RAMCapacity"]}',@SSD='{e["SSDCapacity"]}',@Other='{e["Other"]}',@ItemName='{e["ItemName"]}',@Warrantydate='{e["warrantydate"]}',@Processs='{e["CPUCapacity"]}' ", util.strElect);
+                //    }
+
+                //    Id = "Matrial In SuccessFully";
+                //}
+
+                // Save the data to the database, etc.
+
+                return Json(new { success = true, message = Id });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpPost]
+        public IActionResult ReMaterialOutInsert()
+        {
+            try
+            {
+                
+                string Companyid = Request.Form["Company"].ToString();
+                string branch = Request.Form["branch"].ToString();
+               
+                string Empid = Request.Form["employeeId"].ToString();
+                string Empname = Request.Form["EmployeeName"].ToString();
+                string Empemail = Request.Form["EmailId"].ToString();
+                string Empdpt = Request.Form["Department"].ToString();
+                string remark = Request.Form["Remarks"].ToString();
+                string Empphone = Request.Form["PhoneNo"].ToString();
+                string issrancedate = Request.Form["IssuanceDate"];
+
+                string JsonData = Request.Form["JsonData"].ToString();
+                var objects = JArray.Parse(JsonData);
+                string Id = "";
+                string Metrailno = "";
+                
+
+                
+                if(Empid != "")
+                {
+
+               
+               
+            
+                        DataSet ds1 = new DataSet();
+                        foreach (var e in objects)
+                        {
+
+                            ds1 = util.Fill(@$"exec Usp_ReAssignment @EmpId='{Empid}', @serailno='{e["serailno"]}', @WindowsKey='{e["windowskey"]}',@MSOfficeKey='{e["msofficekey"]}', @materialOutId='{e["outId"]}',@matreailId='{e["matreailId"]}' ", util.strElect);
+                        }
+
+                      
+
+                        Id = "Matrial Out SuccessFully";
                 }
+                else
+                {
+                    Id = "Employee Select";
+                }
+
                 //if (Id == "")
                 //{
                 //    DataSet ds1 = new DataSet();
@@ -277,18 +348,18 @@ namespace ContentManagementSystem.Controllers
         {
             try
             {
-                string fromDate = "";
-                string toDate = "";
+                string fromDate = receivedDateFrom;
+                string toDate = receivedDateTo;
 
-                if (!string.IsNullOrEmpty(receivedDateFrom))
-                {
-                    fromDate = DateTime.ParseExact(receivedDateFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
-                }
+                //if (!string.IsNullOrEmpty(receivedDateFrom))
+                //{
+                //    fromDate = DateTime.ParseExact(receivedDateFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                //}
 
-                if (!string.IsNullOrEmpty(receivedDateTo))
-                {
-                     toDate = DateTime.ParseExact(receivedDateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
-                }
+                //if (!string.IsNullOrEmpty(receivedDateTo))
+                //{
+                //     toDate = DateTime.ParseExact(receivedDateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
+                //}
 
 
                 var ds = util.Fill("exec Usp_AvailableStock @fromdate='" + fromDate + "',@todate='"+toDate+"'", util.strElect);
@@ -405,30 +476,12 @@ namespace ContentManagementSystem.Controllers
         {
             try
             {
-                string receivedFrom = "";
-                string receivedto = "";
-                string Billfrom = "";
-                string Billto = "";
+                string receivedFrom = receivedDateFrom;
+                string receivedto = receivedDateTo;
+                string Billfrom = BillDatefrom;
+                string Billto = BillDateto;
 
-                if (!string.IsNullOrEmpty(receivedDateFrom))
-                {
-                    receivedFrom = DateTime.ParseExact(receivedDateFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
-                }
-
-                if (!string.IsNullOrEmpty(receivedDateTo))
-                {
-                    receivedto = DateTime.ParseExact(receivedDateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
-                }
-
-                if (!string.IsNullOrEmpty(BillDatefrom))
-                {
-                    Billfrom = DateTime.ParseExact(BillDatefrom, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
-                }
-
-                if (!string.IsNullOrEmpty(BillDateto))
-                {
-                    Billto = DateTime.ParseExact(BillDateto, "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
-                }
+             
 
 
                 var ds = util.Fill("exec InvoiceRecord @fromdate='"+Billfrom+"',@todate='"+Billto+"',@rfromdate='"+receivedFrom+"',@rtodate='"+receivedto+"'", util.strElect);
@@ -515,6 +568,7 @@ namespace ContentManagementSystem.Controllers
                          SerialNo = dr["SerialNo"] != DBNull.Value ? dr["SerialNo"].ToString() : string.Empty,
                          ModelNo = dr["ModelNo"] != DBNull.Value ? dr["ModelNo"].ToString() : string.Empty,
                          WarrantyDate = dr["WarrantyDate"] != DBNull.Value ? dr["WarrantyDate"].ToString() : string.Empty,
+                        AssignmentDate = dr["AssignmentDate"].ToString(),
                          Status = dr["Status"] != DBNull.Value ? dr["Status"].ToString() : string.Empty,
 
                      };
@@ -549,7 +603,8 @@ namespace ContentManagementSystem.Controllers
 
                 ViewBag.Companies = util.PopulateDropDown("select * from Companies", util.strElect);
                 ViewBag.Employee = util.PopulateDropDown("select employeeid as Id,(name +' ('+employeeid+')')as Name from Employees", util.strElect);
-                ViewBag.AssetItems = util.PopulateDropDown("select * from AssetItems", util.strElect);
+                ViewBag.AssetItems = util.PopulateDropDown("select * from AssetItems where name <> 'Others'", util.strElect);
+                ViewBag.AssetItemsother = util.PopulateDropDown("select * from AssetItems where name ='Others'", util.strElect);
 
 
                 return View();
@@ -791,5 +846,178 @@ namespace ContentManagementSystem.Controllers
                 return Json(new { success = false, message = "Error creating branch" });
             }
         }
+
+        public IActionResult UpdateMaterialItem()
+        {
+
+            //ViewBag.Companies = util.PopulateDropDown("select * from Companies", util.strElect);
+            //ViewBag.Employee = util.PopulateDropDown("select employeeid as Id,(name +' ('+employeeid+')')as Name from Employees", util.strElect);
+            ViewBag.AssetItems = util.PopulateDropDown("select * from AssetItems where name <> 'Others'", util.strElect);
+            ViewBag.AssetItemsother = util.PopulateDropDown("select * from AssetItems where name ='Others'", util.strElect);
+            ViewBag.employee = util.PopulateDropDown("select distinct a.EmployeeId,Name +'('+a.Employeeid+')' as Name from Employees a  join MaterialOuts b on b.EmployeeId=a.EmployeeId join MaterialAssignments mm on b.Id=mm.MaterialOutId", util.strElect);
+            return View();
+        }
+
+        public JsonResult GetAssignDetails(string EmpId)
+        {
+            var ds = util.Fill("exec Usp_GetUpdateDetails @empid ='" + EmpId + "'", util.strElect);
+            return Json(JsonConvert.SerializeObject(ds.Tables[0]));
+        }
+
+
+        [HttpPost]
+        public JsonResult DeleteAssignDetails(string Id,string? empid)
+        {
+            var msg = util.execQuery("exec Usp_DeleteAssignDetails @id ='" + Id + "',@empid='"+empid+"'", util.strElect);
+            
+            return Json(JsonConvert.SerializeObject(msg));
+
+        }
+        [HttpPost]
+        public JsonResult GetDetailsMaterialIn (string InvoiceNo)
+        {
+            var ds = util.Fill("exec Usp_GetDetailsMaterialIn @InvoiceNo ='" + InvoiceNo + "'", util.strElect);
+            var data = new
+            {
+                dt = ds.Tables[0],
+                dt2 = ds.Tables[1],
+            };
+            return Json(JsonConvert.SerializeObject(data));
+        }
+        [HttpPost]
+        public JsonResult Deletematerial(string Id)
+        {
+            string mesg = "";
+            var ds1 = util.Fill("select count(*) from MaterialItems where id ='" + Id + "' and status='Assigned'", util.strElect);
+            var count = Convert.ToInt32(ds1.Tables[0].Rows[0][0].ToString());
+            if (count == 0)
+            {
+
+
+                util.execQuery("insert into logs_table (materialItemId,enterydate,status,Assetname)values('" + Id + "',getdate(),'Delete',(select AssetItemId from MaterialItems where id='" + Id + "'))", util.strElect);
+                 mesg = util.execQuery("delete from MaterialItems where id ='" + Id + "' and status='Assigned'", util.strElect);
+            }
+            else
+            {
+                mesg = "Item is already assigned. Please unassign it before deleting.";
+
+
+            }
+
+            return Json(JsonConvert.SerializeObject(mesg));
+        }
+       
+
+        public IActionResult AssetAssignmentDetails(string? asset,string? serialno)
+
+
+        {
+            ViewBag.AssetItems = util.PopulateDropDown("select * from AssetItems", util.strElect);
+            ViewBag.SerialNo = util.PopulateDropDown("select Id,SerialNo from MaterialItems", util.strElect);
+
+            var ds = util.Fill("exec Usp_AssetAssignmentDetails @Asset='"+asset+ "',@SerialNo='" + serialno+"'", util.strElect);
+
+            ViewBag.data = ds.Tables[0];
+
+            return View();
+        }
+
+
+        public IActionResult UpdateInvoice()
+        {
+
+            ViewBag.Companies = util.PopulateDropDown("select * from Companies where id=1", util.strElect);
+            ViewBag.AssetItems = util.PopulateDropDown("select * from AssetItems", util.strElect);
+            ViewBag.Vendors = util.PopulateDropDown("select * from Vendors", util.strElect);
+            ViewBag.Manufacturers = util.PopulateDropDown("select * from Manufacturers", util.strElect);
+            ViewBag.InvoiceNo = util.PopulateDropDown("select InvoiceNo,InvoiceNo from Materials ", util.strElect);
+            return View();
+        }
+
+
+
+
+        [HttpPost]
+        public IActionResult UpdateIn(IFormFile? file)
+        {
+            try
+            {
+               
+                string Company = Request.Form["Company"].ToString();
+                //string Company = Request.Form["Company"].ToString();
+                string VendorName = Request.Form["VendorName"].ToString();
+                string Manufacturer = Request.Form["Manufacturer"].ToString();
+                string BillDate = Request.Form["BillDate"].ToString();
+                string ReceivedDate = Request.Form["ReceivedDate"].ToString();
+                string materialid = Request.Form["materialid"].ToString();
+                          
+                string JsonData = Request.Form["JsonData"].ToString();
+                var objects = JArray.Parse(JsonData);
+                string Id = "";
+                string Metrailno = "";
+                string fileName = "";
+                //foreach (var e in objects)
+                //{
+                //    var ds2 = util.Fill(@$"exec ChekcSerailNo @SerialNo='{e["SerialNo"]}' ", util.strElect);
+                //    int no = Convert.ToInt32(ds2.Tables[0].Rows[0][0]);
+                //    if (no > 0)
+                //    {
+                //        Id = "Duplicate Serial No : " + e["SerialNo"];
+                //    }
+
+
+
+
+
+                //}
+
+
+                if (file != null && file.Length > 0 && Id=="")
+                {
+                    string uploadsFolder = Path.Combine("wwwroot", "uploads");
+                    Directory.CreateDirectory(uploadsFolder); // Ensure directory exists
+
+                    string uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    fileName = "uploads/" + uniqueFileName;
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+
+
+                }
+
+                if (Id == "")
+                {
+                    var ds = util.Fill(@$"update Materials set CompanyId='{Company}',CustomVendorName='{VendorName}',ManufacturerId='{Manufacturer}',BillDate='{BillDate}',RecordDate='{ReceivedDate}', ImagePath=case when '{fileName}'='' then ImagePath else '{fileName}' end where id='{materialid}'", util.strElect);
+
+                   
+                }
+                if (Id == "")
+                {
+                    DataSet ds1 = new DataSet();
+                    foreach (var e in objects)
+                    {
+
+                        ds1 = util.Fill(@$"exec Usp_UpdateMatrialItems @Materialid='{e["matrialitemid"]}',@Asstitemid='{e["AssetItemId"]}',@SerialNo='{e["SerialNo"]}',@Modelno='{e["ModelNo"]}',@Gen='{e["Generation"]}',@harddisk='{e["HardDisk"]}',@RamCap='{e["RAMCapacity"]}',@SSD='{e["SSDCapacity"]}',@Other='{e["Other"]}',@ItemName='{e["ItemName"]}',@Warrantydate='{e["WarrantyDate"]}',@Processs='{e["Processor"]}' ", util.strElect);
+                    }
+
+                    Id = "Matrial In Updated SuccessFully";
+                }
+
+               
+
+                return Json(new { success = true, message = Id });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
     }
 }

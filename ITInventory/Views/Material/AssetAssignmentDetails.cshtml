@@ -1,0 +1,255 @@
+﻿@using System.Data
+
+@{
+    ViewData["Title"] = "Asset Assignment Details";
+    var dt = ViewBag.data as DataTable;
+}
+
+<div class="container-fluid">
+    
+
+    <div class="row">
+        <!-- Sidebar -->
+        @await Html.PartialAsync("_Sidebar")
+
+        <!-- Main content -->
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
+                <h3>Asset Assignment Details</h3>
+
+
+                @Html.AntiForgeryToken()
+                @using (Html.BeginForm("AssetAssignmentDetails", "Material", FormMethod.Get))
+                {
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label>Asset Name</label>
+
+
+                            <select name="asset" class="form-control" id="Asset" style="border: 1px solid lightgray;">
+
+                                @if (ViewBag.AssetItems != null)
+
+                                {
+                                    <option value="0">Select</option>
+
+                                    foreach (var item in ViewBag.AssetItems as List<SelectListItem>)
+
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+
+                                }
+                            </select>
+
+                           
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label>Serial No</label>
+
+
+                            <select name="serialno" class="form-control " id="serialno" style="border: 1px solid lightgray;">
+
+                                @if (ViewBag.SerialNo != null)
+
+                                {
+                                    <option value="0">Select</option>
+
+                                    foreach (var item in ViewBag.SerialNo as List<SelectListItem>)
+
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+
+                                }
+                            </select>
+
+                            <input type="text" id="employeeId" placeholder="Employee ID" class="form-control d-none" />
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        
+
+
+                            <div class="form-group mb-3">
+                                <label></label>
+                        <button type="submit" class="btn btn-primary mt-4">Search</button>
+
+                        </div>
+                        </div>
+                </div>
+                }
+               
+
+                <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+                <table id="itemsTable" class="display table table-bordered">
+                    <thead>
+                        <tr>
+                            @foreach (System.Data.DataColumn col in dt.Columns)
+                            {
+                                <th>@col.ColumnName</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (System.Data.DataRow row in dt.Rows)
+                        {
+                            <tr>
+                                @foreach (var item in row.ItemArray)
+                                {
+                                    <td>@item</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <script>
+                    $(document).ready(function () {
+                        $('#itemsTable').DataTable(); // Initialize DataTable
+                    });
+                </script>
+
+               
+                </div>
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+  
+
+    <script>
+       
+        $("#Asset").select2();
+        $("#serialno").select2();
+      
+
+
+
+    </script>
+
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-selection {
+            height: 38px !important;
+            padding: 5px !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 0.25rem !important;
+        }
+
+        .select2-selection__arrow {
+            height: 36px !important;
+        }
+
+        .select2-search__field {
+            width: 100% !important;
+        }
+
+        .select2-results__option {
+            padding: 8px !important;
+        }
+
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #ced4da !important;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 26px !important;
+            }
+
+        select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .loading-select {
+            position: relative;
+        }
+
+            .loading-select::after {
+                content: "Loading...";
+                position: absolute;
+                right: 30px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 12px;
+                color: #6c757d;
+            }
+
+        .branch-select-container {
+            position: relative;
+        }
+
+            .branch-select-container .select2-container {
+                width: 100% !important;
+            }
+
+            .branch-select-container .select2-selection {
+                height: 38px !important;
+                padding: 5px !important;
+                border: 1px solid #ced4da !important;
+                border-radius: 0.25rem !important;
+            }
+
+            .branch-select-container .select2-selection__arrow {
+                height: 36px !important;
+            }
+
+            .branch-select-container .select2-selection__placeholder {
+                color: #6c757d;
+            }
+
+            .branch-select-container .select2-selection__rendered {
+                line-height: 26px !important;
+            }
+
+            .branch-select-container .input-group .btn {
+                border-color: #ced4da;
+            }
+
+                .branch-select-container .input-group .btn:hover {
+                    background-color: #e9ecef;
+                }
+
+      
+
+        .invalid-feedback {
+            display: block;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        
+    </style>
+}
+
+

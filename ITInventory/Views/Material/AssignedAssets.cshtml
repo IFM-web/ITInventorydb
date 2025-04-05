@@ -4,10 +4,12 @@
     <div class="row">
         <!-- Sidebar -->
         @await Html.PartialAsync("_Sidebar")
+        
 
         <!-- Main content -->
-        <div class="col-md-10">
-            <div class="container mt-4">
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
+        
                 <h2>Assigned Assets</h2>
 
                 <!-- Date Filter Form -->
@@ -62,6 +64,7 @@
                                 <th>Serial No</th>
                                 <th>Model No</th>
                                 <th>Warranty Date</th>
+                                <th>Assignment Date</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -79,6 +82,7 @@
                                     <td>@asset.SerialNo</td>
                                     <td>@asset.ModelNo</td>
                                     <td>@(asset.WarrantyDate ?? "-")</td>
+                                    <td>@(asset.AssignmentDate ?? "-")</td>
                                     <td>
                                         <span class="badge bg-success">@asset.Status</span>
                                     </td>
@@ -102,6 +106,8 @@
                                 <th>Serial No</th>
                                 <th>Model No</th>
                                 <th>Warranty Date</th>
+                                <th>Assignment Date</th>
+
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -119,6 +125,7 @@
                                     <td>@asset.SerialNo</td>
                                     <td>@asset.ModelNo</td>
                                     <td>@(asset.WarrantyDate ?? "-")</td>
+                                    <td>@(asset.AssignmentDate ?? "-")</td>
                                     <td>
                                         <span class="badge bg-success">@asset.Status</span>
                                     </td>
@@ -182,6 +189,12 @@
 
             // XLSX.writeFile(wb, fn || (ddd+ (type+ '.' || 'xlsx')));
         }
+
+        function sidebar(){
+            $(".sidebar").hide();
+            
+        }
+
 
         $(document).ready(function() {
             $('#assignedAssetsTable').DataTable({

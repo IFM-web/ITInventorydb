@@ -22,6 +22,7 @@ namespace ContentManagementSystem.Models
         public string SerialNo { get; set; }
         public string ModelNo { get; set; }
         public string WarrantyDate { get; set; }
+        public string AssignmentDate { get; set; }
         public string Status { get; set; }
     }
 } 

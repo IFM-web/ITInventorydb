@@ -1,5 +1,8 @@
 ﻿$(document).ready(() => {
     branch();
+    var selectedValue = $("#AssetItemsgrid2").val();
+    bindserailno(selectedValue, document.getElementById("AssetItemsgrid2"));
+
 })
 
 function geturl() {
@@ -11,61 +14,6 @@ function geturl() {
         return '/itinventory';
 }
 let myurl = geturl();
-
-
-
-
-// Initialize Select2 for employee dropdown
-/*    $('#employeeSelect').select2({
-ajax: {
-url: myurl+'/Material/GetEmployeesList',
-dataType: 'json',
-delay: 250,
-data: function(params) {
-                return {
-search: params.term || ''
-                };
-            },
-processResults: function(data) {
-                return {
-results: data
-                };
-            }
-        },
-minimumInputLength: 1,
-placeholder: 'Search or Enter Employee ID',
-tags: true,
-createTag: function(params) {
-            return {
-id: params.term,
-text: params.term,
-newTag: true
-            };
-        },
-templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span><i class="fas fa-plus"></i> Create new employee: ' + data.text + '</span>');
-            }
-return data.text;
-        }
-    }).on('select2:select', function(e) {
-        const data = e.params.data;
-
-if (data.newTag) {
-// Enable fields for new employee
-$('#EmployeeName, #Department, #EmailId, #PhoneNo').prop('readonly', false).val('');
-toastr.info('Please fill in the employee details');
-        } else {
-// Fill in existing employee details
-$('#EmployeeName').val(data.name);
-$('#Department').val(data.department);
-$('#EmailId').val(data.email);
-$('#PhoneNo').val(data.phoneNo);
-$('#EmployeeName, #Department, #EmailId, #PhoneNo').prop('readonly', true);
-        }
-    });*/
-
-// Initialize first row
 
 
 function branch() {
@@ -352,28 +300,19 @@ function initializeRowEvents(row) {
         }
     });
 
-    // Remove row
     row.find('.remove-row').click(function () {
         if ($('#itemsTableBody tr').length > 1) {
             row.remove();
         }
     });
+    row.find('.remove-row2').click(function () {
+        if ($('#itemsTableBody2 tr').length > 1) {
+            row.remove();
+        }
+    });
 }
 
-//function addNewRow() {
-//    const rowCount = $('#itemsTableBody tr').length;
-//    const newRow = $('#itemsTableBody tr:first').clone();
-//   // newRow.find('input, select').val('');
 
-//    // Reset Select2
-//    newRow.find('.select2-container').remove();
-
-//    // Clear text cells
-//    newRow.find('td[class$="-cell"]').text('');
-
-//    $('#itemsTableBody').append(newRow);
-//    initializeRowEvents(newRow);
-//}
 
 function addNewRow() {
     const newRow = $('#itemsTableBody tr:first').clone(); // Clone the first row
@@ -384,9 +323,9 @@ function addNewRow() {
     // Find the select element
     newRow.find('select').each(function () {
         $(this).val(0); // Reset selected value
-        $(this).removeAttr('data-select2-id'); // Remove Select2 ID
-        $(this).removeClass('select2-hidden-accessible'); // Remove Select2 hidden class
-        $(this).next('.select2-container').remove(); // Remove any existing Select2 instance
+        //$(this).removeAttr('data-select2-id'); // Remove Select2 ID
+        //$(this).removeClass('select2-hidden-accessible'); // Remove Select2 hidden class
+        ///$(this).next('.select2-container').remove(); // Remove any existing Select2 instance
     });
 
     // Clear text cells
@@ -401,6 +340,30 @@ function addNewRow() {
     // Initialize other events on the new row if needed
     initializeRowEvents(newRow);
 }
+function addNewRow2() {
+    const newRow = $('#itemsTableBody2 tr:first').clone(); // Clone the first row
+
+    // Remove old Select2 container
+    newRow.find('.select2-container').remove();
+
+    // Find the select element
+    newRow.find('select').each(function () {
+        $(this).val($(this).find("option:first").val()).trigger('change'); // Reset to first option
+    });
+
+    // Clear text cells
+    newRow.find('td[class$="-cell"]').text('');
+
+    // Append new row to the table
+    $('#itemsTableBody2').append(newRow);
+
+    // Reinitialize Select2 AFTER adding the row
+    newRow.find('select').select2();
+
+    // Initialize other events on the new row if needed
+    initializeRowEvents(newRow);
+}
+
 
 
 
@@ -522,12 +485,16 @@ function addemployee() {
         $(this).prop("readonly", !$(this).prop("readonly"));
     });
 
+    $("#EmployeeName, #Department, #EmailId, #PhoneNo").each(function () {
+        $(this).val("");
+    });
+
 
 }
 function addbranch() {
     $("#branchSelect").toggleClass('d-none').val(0);;
     $("#branchName").toggleClass('d-none').val("");;
-   
+
 
 
 }
@@ -553,12 +520,12 @@ function Validation() {
             msg += "" + name + "  Required !!\n";
         }
     });
-    $(".serailno").each(function () {
-        if ($(this).val() == 0) {
-           
-            msg += "Serial No Required !!\n";
-        }
-    });
+    //$(".serailno").each(function () {
+    //    if ($(this).val() == 0) {
+
+    //        msg += "Serial No Required !!\n";
+    //    }
+    //});
     $(".chkint").each(function () {
         if (!intregex.test($(this).val())) {
             var name = $(this).attr('name')
@@ -578,25 +545,29 @@ function Validation() {
         }
     });
 
-    //if ($("#branchSelect").val() == "0") {
-    //    if ($("#employeeId").val() == "") {
-    //        msg += "Branch Name Required!!\n";
-    //    }
-                      
-    //}
-    //else {
-    //    msg += "Branch Name Required!!\n";
-    //}
+    let branchid = $("#branchSelect").val() 
+    let branchname = $("#branchName").val()
+
+    if (branchid == "0") {
+        if (branchname == "") {
+            msg += "Branch Name Required!!\n";
+        }
+
+
+    }
 
 
 
-    //if ($("#employeeSelect").val() == "0") {
+    let empid = $("#employeeSelect").val()
+    let empname = $("#employeeId").val()
 
-    //    msg += "Employee Id Required!!\n";
-    //}
-    //else {
-    //    msg += "Employee Id Required!!\n";
-    //}
+    if (empid == "0") {
+        if (empname == "") {
+            msg += "Employee Id Required!!\n";
+        }
+
+
+    }
 
     return msg;
 }
@@ -606,75 +577,99 @@ function Insert() {
     if (val == "") {
 
 
-    var fdata = new FormData();
+        var fdata = new FormData();
 
 
-    fdata.append("Company", $("#Company").val());
-    //fdata.append("branch", $("#branchSelect").val());
+        fdata.append("Company", $("#Company").val());
+        //fdata.append("branch", $("#branchSelect").val());
 
-    if ($("#branchSelect").val() == "0") {
-        fdata.append("branch", $("#branchName").val());
-    }
-    else {
-        fdata.append("branch", $("#branchSelect").val());
-    }
-
-
-
-    if ($("#employeeSelect").val() == "0") {
-        fdata.append("employeeId", $("#employeeId").val());
-    }
-    else {
-        fdata.append("employeeId", $("#employeeSelect").val());
-    }
-
-    fdata.append("EmployeeName", $("#EmployeeName").val());
-    fdata.append("Department", $("#Department").val());
-    fdata.append("EmailId", $("#EmailId").val());
-    fdata.append("PhoneNo", $("#PhoneNo").val());
-    fdata.append("IssuanceDate", $("#IssuanceDate").val());
-    fdata.append("Remarks", $("#Remarks").val());
-
-    var itemsArray = [];
-
-    $("#itemsTableBody TR").each(function (index, row) {
-        var Items = {};
-
-        Items.serailno = $(row).find('#serailno').val();
-        Items.windowskey = $(row).find('.windows-key').val();
-        Items.matreailId = $(row).find('.matreailId').text();
-        Items.msofficekey = $(row).find('.msoffice-key').val();
-        itemsArray.push(Items);  // Add to array
-    });
-
-
-
-    console.log(itemsArray);
-
-    fdata.append("JsonData", JSON.stringify(itemsArray));
-
-
-
-    $.ajax({
-
-        url: myurl + '/Material/MaterialOutInsert',
-        type: 'post',
-        data: fdata,
-        contentType: false,
-        processData: false,
-        success: function (data) {
-            if (data.message == 'Matrial Out SuccessFully') {
-                window.location.reload();
-            }
-            alert(data.message);
-
-        },
-        error: function (err) {
-            console.log("Error:", err);
-            alert("Something went wrong!");
+        if ($("#branchSelect").val() == "0") {
+            fdata.append("branch", $("#branchName").val());
         }
-    });
-    } else {
-        alert(val);
+        else {
+            fdata.append("branch", $("#branchSelect").val());
+        }
+
+
+
+        if ($("#employeeSelect").val() == "0") {
+            fdata.append("employeeId", $("#employeeId").val());
+        }
+        else {
+            fdata.append("employeeId", $("#employeeSelect").val());
+        }
+
+        fdata.append("EmployeeName", $("#EmployeeName").val());
+        fdata.append("Department", $("#Department").val());
+        fdata.append("EmailId", $("#EmailId").val());
+        fdata.append("PhoneNo", $("#PhoneNo").val());
+        fdata.append("IssuanceDate", $("#IssuanceDate").val());
+        fdata.append("Remarks", $("#Remarks").val());
+
+        var itemsArray = [];
+
+        $("#itemsTableBody TR").each(function (index, row) {
+            var Items = {};
+            if ($(row).find('#serailno').val() != 0) {
+                Items.serailno = $(row).find('#serailno').val();
+                Items.windowskey = $(row).find('.windows-key').val();
+                Items.matreailId = $(row).find('.matreailId').text();
+                Items.msofficekey = $(row).find('.msoffice-key').val();
+                itemsArray.push(Items);
+            }
+
+        });
+
+
+        $("#itemsTableBody2 TR").each(function (index, row) {
+            var Items = {};
+
+            if ($(row).find('#serailno').val() != 0) {
+
+
+                Items.serailno = $(row).find('#serailno').val();
+                Items.windowskey = $(row).find('.windows-key').val();
+                Items.matreailId = $(row).find('.matreailId').text();
+                Items.msofficekey = $(row).find('.msoffice-key').val();
+                itemsArray.push(Items);
+            }
+        });
+
+        console.log(itemsArray);
+
+        fdata.append("JsonData", JSON.stringify(itemsArray));
+
+
+
+        if (itemsArray.length > 0) {
+
+
+            $.ajax({
+
+                url: myurl + '/Material/MaterialOutInsert',
+                type: 'post',
+                data: fdata,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.message == 'Matrial Out SuccessFully') {
+                        window.location.reload();
+                    }
+                    alert(data.message);
+
+                },
+                error: function (err) {
+                    console.log("Error:", err);
+                    alert("Something went wrong!");
+                }
+            });
+        } else {
+            alert("Please Select Any Item");
+        }
     }
-}
+
+
+        else {
+            alert(val);
+        }
+    }

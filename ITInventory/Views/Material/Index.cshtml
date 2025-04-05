@@ -5,8 +5,8 @@
         @await Html.PartialAsync("_Sidebar")
 
         <!-- Main content -->
-        <div class="col-md-10">
-            <div class="container mt-4">
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
                 @* <h2>Material IN</h2> *@
                 <h3>Material IN Form</h3>
 
@@ -85,10 +85,10 @@
                                 }
                             </select>
                         </div>
-                        <div id="customAssetNameDiv" style="display:none;" class="form-group mb-3">
+                       @*  <div id="customAssetNameDiv" style="display:none;" class="form-group mb-3">
                             <label class="form-label">Custom Asset Name</label>
                             <input type="text" class="form-control" id="customAssetName" placeholder="Optional" />
-                        </div>
+                        </div> *@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group mb-3">
@@ -115,34 +115,25 @@
                         </div>
                         <div class="form-group mb-3">
                             <label>Bill Date</label>
-                            <div class="input-group">
-                                <input type="text"
+                          
+                                <input type="date"
                                        id="BillDate"
                                        name="BillDate"
-                                       class="form-control date-picker"
-                                       required
-                                       placeholder="DD/MM/YYYY"
-                                       autocomplete="off" />
-                                <span class="input-group-text">
-                                    <i class="fas fa-calendar"></i>
-                                </span>
-                            </div>
+                                       class="form-control"                                     
+                                       
+                                     >
+                          
 
                         </div>
 
                         <div class="form-group mb-3">
                             <label class="form-label">Received Date</label>
-                            <div class="input-group">
-                                <input type="text" id="ReceivedDate"
-                                       class="form-control date-picker"
+                            
+                                <input type="date" id="ReceivedDate"
+                                       class="form-control"
                                        name="ReceivedDate"
-                                       required
-                                       placeholder="DD/MM/YYYY"
-                                       autocomplete="off" />
-                                <span class="input-group-text">
-                                    <i class="fas fa-calendar"></i>
-                                </span>
-                            </div>
+                                       />
+                           
                         </div>
                         <div class="form-group mb-3">
                             <lable>Receive Quantity</lable>
@@ -278,39 +269,12 @@
         });
 
 
-        $(document).ready(function () {
-            $(".date-picker").datepicker({
-                format: 'dd/mm/yyyy',
-                autoclose: true,
-                todayHighlight: true,
-                clearBtn: true
-            });
-
-            $('.input-group-text').click(function () {
-                let inputField = $(this).closest('.input-group').find('.date-picker');
-                if (inputField.length) {
-                    inputField.datepicker('show');
-                } else {
-                    console.error("Datepicker input field not found.");
-                }
-            });
-        });
+        
     });
 
     
 
-    $('input[name="BillDate"],input[name="ReceivedDate"]').datepicker({
-                format: 'dd/mm/yyyy',
-                autoclose: true,
-                todayHighlight: true,
-                clearBtn: true
-            });
-
-            // Update the search form
-            $('.date-picker').on('changeDate', function() {
-                $(this).datepicker('hide');
-            });
-
+    
 
 
 </script>

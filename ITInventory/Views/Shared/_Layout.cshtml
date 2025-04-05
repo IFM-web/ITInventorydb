@@ -113,7 +113,10 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                
+              
+                    <span onclick="sidebar()" style="cursor:pointer" class="navbar-toggler-icon"></span>
+               
+              
             </div>
             <div class="navbar-nav ms-auto">
                 @if (Context.Session.GetString("UserId") != null)
@@ -172,6 +175,11 @@
             "timeOut": "3000"
         };
 
+        function sidebar() {
+            $(".sidebar").toggle(); // Toggle sidebar visibility
+            $("#div").toggleClass("col-md-10 col-md-12"); // Adjust content width
+            $("#divcont").toggleClass("container");
+        }
         // Initialize all tooltips
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();

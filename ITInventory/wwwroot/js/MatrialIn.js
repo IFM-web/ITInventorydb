@@ -9,7 +9,11 @@ function geturl() {
         return '/itinventory';
 }
 let myurl = geturl();
+var srnomain = 1;
+var srnomain2 = 1;
 function updateTableRows() {
+
+ 
     const quantity = parseInt(document.getElementById('reqnQuantity').value);
     const assetType = $("#AssetItem option:selected").text();
     const assetTypeid = $("#AssetItem").val();
@@ -23,7 +27,7 @@ function updateTableRows() {
         for (let i = 0; i < 1; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                    <td>${i + 1}</td>
+                    <td>${srnomain}</td>
                             <td>${assetType}</td>
                              <td class='d-none'>
                                       <input type="text"
@@ -97,15 +101,16 @@ function updateTableRows() {
 </td>
                 `;
             tbody.append(row);
+           
         }
-       
+        setsrno();
     }
     if (assetType=="Others") {
         const tbody = document.getElementById('itemsTableBody2');
         for (let i = 0; i < 1; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                    <td>${i + 1}</td>
+                    <td id='serno'></td>
                             <td>${assetType}</td>
                                     <td class='d-none'>
                                       <input type="text" 
@@ -178,12 +183,13 @@ function updateTableRows() {
                                placeholder="Enter other details" />
                     </td>
                       <td>
-    <button class='btn btn-danger' onclick="removeRow(this)">
+    <button class='btn btn-danger' onclick="removeRow2(this)">
         <i class="fas fa-trash-alt"></i> 
     </button>
 </td>
                 `;
             tbody.append(row);
+            setsrno2()
         }
     }
 
@@ -213,6 +219,16 @@ function removeRow(button) {
     row.remove();
     const input = document.getElementById('reqnQuantity');
     input.value = parseInt(input.value) - 1;
+    setsrno()
+}
+function removeRow2(button) {
+    // This removes the row that contains the button
+    var row = button.closest('tr');
+
+    row.remove();
+    const input = document.getElementById('reqnQuantity');
+    input.value = parseInt(input.value) - 1;
+    setsrno2()
 }
 
 
@@ -605,7 +621,7 @@ function Insert() {
     fdata.append("Invoice", $("#Invoice").val());
     fdata.append("Companyid", $("#Companyid").val());
     fdata.append("AssetItem", $("#AssetItem").val());
-    fdata.append("customAssetName", $("#customAssetName").val());
+    //fdata.append("customAssetName", $("#customAssetName").val());
     fdata.append("Vendor", $("#Vendor").val());
     fdata.append("customVendorName", $("#customVendorName").val());
     fdata.append("Manufacturer", $("#Manufacturer").val());
@@ -660,6 +676,7 @@ function Insert() {
         var guestFileUpload = $("#invoiceUpload").get(0);
                     if (guestFileUpload.files.length > 0) {
         fdata.append("file", guestFileUpload.files[0]);
+        fdata.append("FileName", guestFileUpload);
                     }
 
  
@@ -686,4 +703,25 @@ function Insert() {
     } else {
         alert(val);
     }
+}
+
+
+function setsrno() {
+    var i = 0;
+    $("#itemsTableBody TR").each(function () {
+        i++;
+        var row = $(this);
+        row.find('td:eq(0)').html(i);
+      //  $("#serno").html(i);
+    });
+}
+
+function setsrno2() {
+    var i = 0;
+    $("#itemsTableBody2 TR").each(function () {
+        i++;
+        var row = $(this);
+        row.find('td:eq(0)').html(i);
+       // $("#serno").html(i);
+    });
 }

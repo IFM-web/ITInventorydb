@@ -1,0 +1,431 @@
+﻿
+@{
+    ViewData["Title"] = "Update Invoice";
+}
+
+
+
+<div class="container-fluid">
+    @if (TempData["Success"] != null)
+    {
+        <div class="card mb-3 border-success">
+            <div class="card-body text-success">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-2 fs-4"></i>
+                    <div>
+                        <h5 class="card-title mb-0">Success!</h5>
+                        <p class="card-text mb-0">@TempData["Success"]</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Please correct the following errors:</strong>
+            <ul>
+                @foreach (var modelState in ViewData.ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                }
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Sidebar -->
+        @await Html.PartialAsync("_Sidebar")
+
+        <!-- Main content -->
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
+                <h3>Update Material In</h3>
+
+
+                @Html.AntiForgeryToken()
+
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label>Invoice No </label>
+
+
+                            <select name="Invoice No" onchange="GetDetailsMaterialIn()" class="form-control " id="InvoiceNo" style="border: 1px solid lightgray;">
+
+                                @if (ViewBag.InvoiceNo != null)
+
+                                {
+                                    <option value="0">Select</option>
+
+                                    foreach (var item in ViewBag.InvoiceNo as List<SelectListItem>)
+
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+
+                                }
+                            </select>
+
+
+
+                        </div>
+                    </div>
+                
+                </div>
+                <div class="row">
+
+                    <input type="hidden" id="materialid" />
+                    <input type="hidden" id="matrialitemid" />
+                    
+                    <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label>Company</label>
+                    <select name="Company Name" class="form-control mandatory" id="Companyid" style="border: 1px solid lightgray;">
+                        <option value="0">Select</option>
+                        @if (ViewBag.Companies != null)
+
+
+                        {
+
+                            foreach (var item in ViewBag.Companies as List<SelectListItem>)
+
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+
+
+                        }
+                    </select>
+                </div>
+                </div>
+                    <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label class="form-label">Vendor Name</label>
+                    <input type="text" class="form-control" name="NewMaterial.CustomVendorName" id="customVendorName" placeholder="Enter Vendor Name" />
+
+                </div>
+                </div>
+                    @*    <div class="col-md-4">
+                         <div class="form-group mb-3">
+                    <label>Asset Item</label>
+
+
+                    <select name="AssetItem Name" class="form-control mandatory" id="AssetItem" style="border: 1px solid lightgray;">
+                        <option value="0">Select</option>
+                        @if (ViewBag.AssetItems != null)
+
+                        {
+
+
+
+                            foreach (var item in ViewBag.AssetItems as List<SelectListItem>)
+
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+
+
+
+                        }
+                    </select>
+                            </div>
+
+
+                    </div>*@
+            <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label>Manufacturer</label>
+
+
+                    <select name="Manufacturer Name" class="form-control mandatory" id="Manufacturer" style="border: 1px solid lightgray;">
+                        <option value="0">Select</option>
+                        @if (ViewBag.Manufacturers != null)
+
+                        {
+                            foreach (var item in ViewBag.Manufacturers as List<SelectListItem>)
+
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+
+                        }
+                    </select>
+                </div>
+               
+                <div id="customManufacturerNameDiv" style="display:none;" class="form-group mb-3">
+                    <label class="form-label">Custom Manufacturer Name</label>
+                    <input type="text" class="form-control" name="CustomManufacturerName" id="customManufacturerName" placeholder="Enter Manufacturer Name" />
+                </div>
+                </div>
+                    <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label>Bill Date</label>
+
+                    <input type="date"
+                           id="BillDate"
+                           name="BillDate"
+                           class="form-control">
+
+
+                </div>
+                </div>
+                    <div class="col-md-4">
+                <div class="form-group mb-3">
+                    <label class="form-label">Received Date</label>
+
+                    <input type="date" id="ReceivedDate"
+                           class="form-control"
+                           name="ReceivedDate" />
+
+                </div>
+                </div>
+                
+            </div>
+        </>
+
+        <div class="mb-3">
+            <label class="form-label">Invoice Image</label>
+            <div>
+                <button type="button" class="btn btn-secondary" onclick="uploadInvoice()">
+                    <i class="fas fa-upload"></i> Upload Invoice Images
+                </button>
+                <input type="file" id="invoiceUpload" name="ImageFile" style="display :None" />
+            </div>
+        </div>
+                <div class="table-responsive mt-4 w-100" id="mydiv1">
+                    <table class="table table-bordered" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Serial No</th>
+                                <th>Model No</th>
+
+                                <th>Generation</th>
+                                <th>Processor</th>
+                                <th>RAM (GB)</th>
+                                <th>HDD</th>
+                                <th>SSD</th>
+                               
+                                <th>Warranty Date</th>
+                                <th>Other Details</th>
+                                <th>Action</th> 
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Serial No</th>
+                                <th>Model No</th>
+                                <th>Name</th>
+                                <th>Warranty Date</th>
+                                <th>Other Details</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody2">
+                        </tbody>
+                    </table>
+                </div>
+               
+                    <div class="text-end mt-3">
+                    <button type="submit" onclick="Update()" class="btn btn-primary" id="submitButton">
+                            Update
+                        </button>
+                        <a href="" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </div>
+
+                @* <button type="button" class="btn btn-secondary" onclick="addNewRow()">Add More Items</button> *@
+                @* <button type="button" class="btn btn-secondary" onclick="addNewRow2()">Add More Other</button> *@
+            </div>
+
+
+
+
+        </div>
+
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script src="~/js/UpdateInvoice.js"></script>
+
+    <script>
+        // $("#Company").select2();
+        // $("#branchSelect").select2();
+        //$("#employeeSelect").select2();
+        //$("#AssetItemsgrid").select2();
+        $("#InvoiceNo").select2();
+        $(".serailno").select2();
+
+        function addItems() {
+            $("#mydiv").toggle();
+            $("#mydiv1").toggle();
+
+        }
+
+
+
+    </script>
+
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-selection {
+            height: 38px !important;
+            padding: 5px !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 0.25rem !important;
+        }
+
+        .select2-selection__arrow {
+            height: 36px !important;
+        }
+
+        .select2-search__field {
+            width: 100% !important;
+        }
+
+        .select2-results__option {
+            padding: 8px !important;
+        }
+
+        .select2-container--default .select2-selection--single {
+            border: 1px solid #ced4da !important;
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__rendered {
+                line-height: 26px !important;
+            }
+
+        select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .loading-select {
+            position: relative;
+        }
+
+            .loading-select::after {
+                content: "Loading...";
+                position: absolute;
+                right: 30px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 12px;
+                color: #6c757d;
+            }
+
+        .branch-select-container {
+            position: relative;
+        }
+
+            .branch-select-container .select2-container {
+                width: 100% !important;
+            }
+
+            .branch-select-container .select2-selection {
+                height: 38px !important;
+                padding: 5px !important;
+                border: 1px solid #ced4da !important;
+                border-radius: 0.25rem !important;
+            }
+
+            .branch-select-container .select2-selection__arrow {
+                height: 36px !important;
+            }
+
+            .branch-select-container .select2-selection__placeholder {
+                color: #6c757d;
+            }
+
+            .branch-select-container .select2-selection__rendered {
+                line-height: 26px !important;
+            }
+
+            .branch-select-container .input-group .btn {
+                border-color: #ced4da;
+            }
+
+                .branch-select-container .input-group .btn:hover {
+                    background-color: #e9ecef;
+                }
+
+        #customBranch {
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .is-valid {
+            border-color: #198754;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .invalid-feedback {
+            display: block;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        .computer-column {
+            display: none;
+        }
+
+        .computer-asset .computer-column {
+            display: table-cell;
+        }
+
+        .card.border-success {
+            border-width: 2px;
+        }
+
+            .card.border-success .card-body {
+                padding: 1rem;
+            }
+
+        .text-success {
+            color: #198754 !important;
+        }
+    </style>
+}
+
+

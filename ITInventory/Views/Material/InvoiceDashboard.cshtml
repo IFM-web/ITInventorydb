@@ -7,8 +7,8 @@
         @await Html.PartialAsync("_Sidebar")
 
         <!-- Main content -->
-        <div class="col-md-10">
-            <div class="container mt-4">
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
                 <h3>Invoice Record</h3>
 
                 <!-- Search and Filter Section -->
@@ -28,16 +28,12 @@
                                         <label>Bill Date From</label>
                                         <div class="input-group">
                                             <div class="input-group">
-                                                <input type="text"
+                                                <input type="date"
                                                        id="BillDatefrom"
                                                        name="BillDatefrom"
-                                                       class="form-control date-picker"
-                                                       
-                                                       placeholder="DD/MM/YYYY"
-                                                       autocomplete="off" />
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-calendar"></i>
-                                                </span>
+                                                       class="form-control"
+                                                        />
+                                                
                                             </div>
 
                                      
@@ -48,15 +44,12 @@
                                     <div class="form-group">
                                         <label>Bill Date To</label>
                                         <div class="input-group">
-                                            <input type="text"
+                                            <input type="date"
                                                    name="BillDateto"
-                                                   class="form-control date-picker"
-                                                   placeholder="To Date"
-                                                   @* value="@(Model.Received)" *@
-                                                   autocomplete="off" />
-                                            <span class="input-group-text">
-                                                <i class="fas fa-calendar"></i>
-                                            </span>
+                                                   class="form-control"
+                                                   placeholder="To Date"                                                   
+                                                   />
+
                                         </div>
                                     </div>
                                 </div>
@@ -64,11 +57,9 @@
                                     <div class="form-group">
                                         <label>Received Date From</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control datepicker date-picker" id="receivedDateFrom"
+                                            <input type="date" class="form-control" id="receivedDateFrom"
                                                    name="receivedDateFrom" value="@Model.ReceivedDateFrom" placeholder="DD/MM/YYYY">
-                                            <span class="input-group-text">
-                                                <i class="fas fa-calendar"></i>
-                                            </span>
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -76,11 +67,9 @@
                                     <div class="form-group">
                                         <label>Received Date To</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control datepicker date-picker" id="receivedDateTo" 
+                                            <input type="date" class="form-control" id="receivedDateTo" 
                                                    name="receivedDateTo" value="@Model.ReceivedDateTo" placeholder="DD/MM/YYYY">
-                                            <span class="input-group-text">
-                                                <i class="fas fa-calendar"></i>
-                                            </span>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -143,12 +132,12 @@
                                     <td>
                                         @if (!string.IsNullOrEmpty(material.ImagePath))
                                         {
-                                            @* <a href="@material.ImagePath" target="_blank" class="btn btn-sm btn-outline-primary"> *@
-                                            @*     <i class="fas fa-image"></i> View *@
-                                            @* </a> *@
-                                            <a href="#" onclick="openImage('@material.ImagePath')" class="btn btn-sm btn-outline-primary">
-                                                <i class="fas fa-image"></i> View
+                                            <a href="~/@material.ImagePath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                               <i class="fas fa-image"></i> View
                                             </a>
+                                        @*     <a href="@material.ImagePath" onclick="openImage('@material.ImagePath')" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-image"></i> View
+                                            </a> *@
                                         }
                                     </td>
                                     <td>@material.TotalItem</td>
@@ -429,12 +418,12 @@
 
         $(document).ready(function () {
             // Initialize datepickers
-        $('input[name="receivedDateFrom"],input[name="BillDatefrom"],input[name="BillDateto"], input[name="receivedDateTo"]').datepicker({
-                format: 'dd/mm/yyyy',
-                autoclose: true,
-                todayHighlight: true,
-                clearBtn: true
-            });
+        // $('input[name="receivedDateFrom"],input[name="BillDatefrom"],input[name="BillDateto"], input[name="receivedDateTo"]').datepicker({
+        //         format: 'dd/mm/yyyy',
+        //         autoclose: true,
+        //         todayHighlight: true,
+        //         clearBtn: true
+        //     });
 
             // Update the search form
             $('.date-picker').on('changeDate', function () {

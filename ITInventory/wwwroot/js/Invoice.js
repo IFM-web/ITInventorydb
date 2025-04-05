@@ -225,6 +225,7 @@
       
 
     function clearFilters() {
+
         $('#searchTerm').val('');
     $('.date-picker').val('');
     $('#filterForm').submit();

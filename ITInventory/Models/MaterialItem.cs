@@ -45,6 +45,7 @@ namespace ContentManagementSystem.Models
             get => _warrantyDate;
             set => _warrantyDate = value;
         }
+
         string SearchTerm { get; set; }
 
         [NotMapped]

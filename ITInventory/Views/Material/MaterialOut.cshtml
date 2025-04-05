@@ -38,8 +38,8 @@
         @await Html.PartialAsync("_Sidebar")
 
         <!-- Main content -->
-        <div class="col-md-10">
-            <div class="container mt-4">
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
                 <h3>Asset Assignment to Employee</h3>
 
               
@@ -105,8 +105,8 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label>Employee Name</label>
-                                
-                                <input type="text" id="EmployeeName" name="EmployeeName" class="form-control" required readonly
+
+                            <input type="text" id="EmployeeName" name="EmployeeName" class="form-control mandatory" required readonly
                                        placeholder="Employee Name" />
                             </div>
                         </div>
@@ -115,16 +115,16 @@
                             <div class="form-group mb-3">
                                 <lable>Department</lable>
 
-                             
-                                <input type="text" id="Department" name="Department" class="form-control" required readonly
+
+                            <input type="text" id="Department" name="Department" class="form-control mandatory" required readonly
                                        placeholder="Department" />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label>Email ID</label>
-                               
-                                <input type="email" id="EmailId" name="EmailId" class="form-control" required readonly
+
+                            <input type="email" id="EmailId" name="EmailId" class="form-control mandatory"  readonly
                                        placeholder="Email ID" />
                             </div>
                         </div>
@@ -132,8 +132,8 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label>Phone Number</label>
-                               
-                                <input type="text" id="PhoneNo" name="PhoneNo" class="form-control" required readonly
+
+                            <input type="text" id="PhoneNo" name="PhoneNo" class="form-control mandatory"  readonly
                                        placeholder="Phone Number" />
                             </div>
                         </div>
@@ -161,15 +161,14 @@
                                     <th>Asset</th>
                                     <th>Serial No</th>
                                     <th>Model No</th>
-                                    <th class="d-none"></th>
-                                    <th class="othername">Name</th>
-                                    <th class="computer-column">Generation</th>
-                                    <th class="computer-column">Processor</th>
-                                    <th class="computer-column">RAM (GB)</th>
-                                    <th class="computer-column">HDD</th>
-                                    <th class="computer-column">SSD</th>
-                                    <th class="computer-column">Windows Key</th>
-                                    <th class="computer-column">MS Office Key</th>
+                                    <th class="d-none"></th>                                   
+                                    <th>Generation</th>
+                                    <th>Processor</th>
+                                    <th>RAM (GB)</th>
+                                    <th>HDD</th>
+                                    <th>SSD</th>
+                                    <th>Windows Key</th>
+                                    <th>MS Office Key</th>
                                     <th>Warranty Date</th>
                                     <th>Other Details</th>
                                     <th>Action</th>
@@ -179,7 +178,7 @@
                                 @{ var i = 0; }
                                 <tr>
                                     <td>
-                                        <select name="Asset Item" class="form-control asset-select mandatory" id="AssetItemsgrid" onchange="bindserailno(this.value,this)" style="border: 1px solid lightgray;">
+                                        <select name="Asset Item" class="form-control asset-select " id="AssetItemsgrid" onchange="bindserailno(this.value,this)" style="border: 1px solid lightgray;">
                                             <option value="0">Select</option>
                                             @if (ViewBag.AssetItems != null)
 
@@ -194,7 +193,75 @@
                                         </select>
                                     </td>
                                     <td>
-                                    <select onchange="binddetails(this.value,this)" id="serailno" class="form-control serailno" name="serialno-select_@i" required>
+                                    <select onchange="binddetails(this.value,this)" id="serailno" class="form-control serailno2" name="serialno-select_@i" >
+                                            <option value="0">Select</option>
+                                        </select>
+                                    </td>
+                                    <td class="model-no-cell"></td>
+                                <td class="matreailId d-none"></td>
+                                  
+                                    <td class="generation-cell"></td>
+                                    <td class="processor-cell "></td>
+                                    <td class="ram-cell "></td>
+                                    <td class="hdd-cell "></td>
+                                    <td class="ssd-cell "></td>
+                                    <td class="">
+                                        <input type="text" class="form-control windows-key" name="WindowsKey" />
+                                    </td>
+                                    <td class="">
+                                        <input type="text" class="form-control msoffice-key" name="MSOfficeKey" />
+                                    </td>
+                                    <td class="warranty-date-cell"></td>
+                                    <td class="other-details-cell"></td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-bordered" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Serial No</th>
+                                    <th>Model No</th>
+                                    <th class="d-none"></th>
+                                    <th class="othername">Name</th>
+                                    <th class="computer-column">Generation</th>
+                                    <th class="computer-column">Processor</th>
+                                    <th class="computer-column">RAM (GB)</th>
+                                    <th class="computer-column">HDD</th>
+                                    <th class="computer-column">SSD</th>
+                                    <th class="computer-column">Windows Key</th>
+                                    <th class="computer-column">MS Office Key</th>
+                                    <th>Warranty Date</th>
+                                    <th>Other Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody2">
+                              
+                                <tr>
+                                    <td>
+                                        <select name="Asset Item" class="form-control asset-select" id="AssetItemsgrid2" onchange="bindserailno(this.value,this)" style="border: 1px solid lightgray;">
+                                            @* <option value="0"> Select </option> *@
+                                          
+                                        @if (ViewBag.AssetItemsother != null)
+
+
+
+                                        {
+
+                                            foreach (var item in ViewBag.AssetItemsother as List<SelectListItem>)
+
+                                            {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                    <select onchange="binddetails(this.value,this)" id="serailno" class="form-control serailno" name="serialno-select" required>
                                             <option value="0">Select</option>
                                         </select>
                                     </td>
@@ -215,12 +282,13 @@
                                     <td class="warranty-date-cell"></td>
                                     <td class="other-details-cell"></td>
                                     <td>
-                                        <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
+                                        <button type="button" class="btn btn-danger btn-sm remove-row2">Remove</button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <button type="button" class="btn btn-secondary" onclick="addNewRow()">Add More Items</button>
+                        <button type="button" class="btn btn-secondary" onclick="addNewRow()">Add More Items</button> 
+                        <button type="button" class="btn btn-secondary" onclick="addNewRow2()">Add More Other</button>
                     </div>
 
                     <div class="text-end mt-3">
@@ -250,9 +318,12 @@
        // $("#branchSelect").select2();
         //$("#employeeSelect").select2();
         //$("#AssetItemsgrid").select2();
-        $("#serailno").select2();
+        //$("#AssetItemsgrid").select2();
+      
 
-
+            $(".serailno").select2();
+            $(".serailno2").select2();
+        
        
     </script>
 

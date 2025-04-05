@@ -9,8 +9,8 @@
     let myurl = geturl();
     // Function to open the image in a new tab
     function openImage(imagePath) {
-        let baseUrl = geturl();
-    let fullUrl = baseUrl + imagePath;
+      
+        let fullUrl = myurl + imagePath;
     window.open(fullUrl, '_blank');
         }
 
