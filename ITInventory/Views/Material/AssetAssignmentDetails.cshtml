@@ -28,7 +28,7 @@
                             <label>Asset Name</label>
 
 
-                            <select name="asset" class="form-control" id="Asset" style="border: 1px solid lightgray;">
+                                <select name="asset" class="form-control" id="Asset" onchange="bindserailno(this.value)" style="border: 1px solid lightgray;">
 
                                 @if (ViewBag.AssetItems != null)
 
@@ -80,6 +80,7 @@
                             <div class="form-group mb-3">
                                 <label></label>
                         <button type="submit" class="btn btn-primary mt-4">Search</button>
+                                <button onclick="exportexcel()" class="btn btn-primary mt-4">Excel</button>
 
                         </div>
                         </div>
@@ -113,11 +114,7 @@
                     </tbody>
                 </table>
 
-                <script>
-                    $(document).ready(function () {
-                        $('#itemsTable').DataTable(); // Initialize DataTable
-                    });
-                </script>
+               
 
                
                 </div>
@@ -143,11 +140,63 @@
   
 
     <script>
-       
+        function exportexcel(type, fn, dl) {
+
+            var ddd = 'Asset Assignment Details';
+            var elt = document.getElementById('itemsTable');
+            console.log(elt);
+            var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+
+
+            return dl ?
+                XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+                XLSX.writeFile(wb, fn || (ddd + '.' + (type || 'xlsx')));
+
+            // XLSX.writeFile(wb, fn || (ddd+ (type+ '.' || 'xlsx')));
+        }
+
+
+
+
+        function geturl() {
+            let url = window.location.hostname;
+            if (url == 'localhost') {
+                return '';
+            }
+            else
+                return '/itinventory';
+        }
+
+        let myurl = geturl();
+
         $("#Asset").select2();
         $("#serialno").select2();
-      
 
+        function bindserailno(e) {
+        
+            $.ajax({
+                url: myurl + '/Material/GetSearilNO',
+                type: "get",
+                data: { assentid: e },
+                success: function (data) {
+              
+                    var data = JSON.parse(data);
+                    
+                    var dropdown = $("#serialno");
+                    dropdown.empty();
+                    dropdown.append($('<option></option>').attr('value', 0).text('Select'));
+                    for (var i = 0; i < data.length; i++) {
+
+                        dropdown.append($('<option></option>').attr('value', data[i].Value).text(data[i].Text));
+                    }
+                },
+                error: (err) => {
+                    alert(err)
+                }
+            })
+
+
+        };
 
 
     </script>

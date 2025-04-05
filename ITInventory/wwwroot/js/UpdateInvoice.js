@@ -122,8 +122,16 @@ function DeleteItem(Id,e) {
         data: { Id: Id },
         success: (data) => {
             data = JSON.parse(data);
-            removeRow(e)
-            alert(data);
+          
+            if (data == "Successfull") {
+                removeRow(e)
+                alert("Item Has been Deleted Successfull");
+
+            } else {
+                alert(data);
+            }
+           
+          
 
 
         },

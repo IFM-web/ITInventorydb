@@ -895,7 +895,7 @@ namespace ContentManagementSystem.Controllers
 
 
                 util.execQuery("insert into logs_table (materialItemId,enterydate,status,Assetname)values('" + Id + "',getdate(),'Delete',(select AssetItemId from MaterialItems where id='" + Id + "'))", util.strElect);
-                 mesg = util.execQuery("delete from MaterialItems where id ='" + Id + "' and status='Assigned'", util.strElect);
+                 mesg = util.execQuery("delete from MaterialItems where id ='" + Id + "' and status='Unassigned'", util.strElect);
             }
             else
             {
