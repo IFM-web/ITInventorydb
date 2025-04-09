@@ -76,6 +76,7 @@ namespace GuardTour
                     sqcmd.CommandTimeout = 0;
                     SqlDataAdapter SqlDa = new SqlDataAdapter(sqcmd);
                     SqlDa.Fill(ds);
+                    
                 }
                 catch (Exception exce)
                 {

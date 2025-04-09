@@ -587,7 +587,7 @@ function Insert() {
             fdata.append("branch", $("#branchName").val());
         }
         else {
-            fdata.append("branch", $("#branchSelect").val());
+            fdata.append("branch", $("#branchSelect option:selected").text() );
         }
 
 

@@ -680,7 +680,7 @@ namespace ContentManagementSystem.Controllers
         {
             try
             {
-                var ds = util.PopulateDropDown("select Id,serialNo from MaterialItems where assetitemid='" + assentid + "'and status ='UnAssigned'", util.strElect);
+                var ds = util.PopulateDropDown("select Id,serialNo from MaterialItems where assetitemid='" + assentid + "'", util.strElect);
 
 
 
