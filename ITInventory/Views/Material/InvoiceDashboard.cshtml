@@ -1,6 +1,7 @@
 @model ContentManagementSystem.Models.MaterialViewModel
 
-
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
@@ -100,7 +101,10 @@
                     <table class="table table-bordered" id="invoiceTable">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 50px;"></th>
+                                @if (Context.Session.GetString("UserType") == "Super Admin")
+                                {
+                                    <th style="width: 50px;"></th>
+                                }
                                 <th>Invoice No</th>
                                 <th>Bill Date</th>
                                 <th>Received Date</th>
@@ -116,11 +120,13 @@
                             @foreach (var material in Model.Materials)
                             {
                                 <tr class="main-row" data-material-id="@material.Id">
+                                    @if (Context.Session.GetString("UserType") == "Super Admin")
+                                    {
                                     <td class="text-center">
                                         <button type="button" class="btn btn-link expand-button" data-material-id="@material.Id">
                                             <i class="fas fa-chevron-circle-right"></i>
                                         </button>
-                                    </td>
+                                    </td>}
                                     <td>@material.InvoiceNo</td>
                                     <td>@material.BillDate</td>
                                     <td>@material.RecordDate</td>

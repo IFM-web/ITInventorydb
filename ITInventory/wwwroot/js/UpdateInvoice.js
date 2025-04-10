@@ -98,7 +98,7 @@ function createDropdown(selectedId) {
 
     let assetItems = [
         { id: 1, name: "Laptop" },
-        { id: 2, name: "Dasktop" },
+        { id: 2, name: "Desktop" },
         { id: 3, name: "Server" },
         { id: 4, name: "Others" }
     ];
@@ -795,6 +795,57 @@ function Update() {
 
 function uploadInvoice() {
     document.getElementById('invoiceUpload').click();
+}
+
+
+
+function DeleteInvoiceOrItems() {
+    if ($("#InvoiceNo").val() != "0") {
+
+
+        $.ajax({
+            url: myurl + "/Material/DeleteInvoiceOrItems",
+            type: "post",
+            data: { invoiceNo: $("#InvoiceNo").val() },
+            success: (data) => {
+                var data = JSON.parse(data);
+                if (data[0].Status == "Success") {
+                    alert(data[0].Massage);
+                    window.location.reload();
+                } else {
+                    alert(data[0].Massage);
+                }
+              
+            }
+
+        });
+    } else {
+        alert("Invoice No Required !!");
+    }
+}
+
+function DeleteAllItems() {
+    if ($("#InvoiceNo").val() != "0") {
+
+
+        $.ajax({
+            url: myurl + "/Material/DeleteAllItems",
+            type: "post",
+            data: { invoiceNo: $("#InvoiceNo").val() },
+            success: (data) => {
+                var data = JSON.parse(data);
+                if (data[0].Status == "Success") {
+                    alert(data[0].Massage);
+                    window.location.reload();
+                } else {
+                    alert(data[0].Massage);
+                }
+            }
+
+        });
+    } else {
+        alert("Invoice No Required !!");
+    }
 }
 
 

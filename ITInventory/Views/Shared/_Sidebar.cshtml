@@ -1,56 +1,82 @@
-﻿<div class="col-md-2 bg-light sidebar">
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<div class="col-md-2 bg-light sidebar">
     <div class="position-sticky pt-3">
         <ul class="nav flex-column">
-            @* <li class="nav-item"> *@
-            @*     <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Index" && ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")"  *@
-            @*        href="@Url.Action("Index", "Home")"> *@
-            @*         Home *@
-            @*     </a> *@
-            @* </li> *@
             <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Index" && ViewContext.RouteData.Values["Controller"].ToString() == "Material" ? "active" : "")" 
-                   href="@Url.Action("Index", "Material")">
-                    Material IN
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "MainDashboard" && ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")"
+                   href="@Url.Action("MainDashboard", "Home")">
+                    Dashboard
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("MaterialOut", "Material")">
+             @if (Context.Session.GetString("UserType") == "Super Admin")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Profile" && ViewContext.RouteData.Values["Controller"].ToString() == "Admin" ? "active" : "")"
+                   href="@Url.Action("Profile", "Admin")">
+                    Profile
+                </a>
+            </li>}
+            @if (Context.Session.GetString("UserType") == "Admin" || Context.Session.GetString("UserType") == "Super Admin")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "Index" && ViewContext.RouteData.Values["Controller"].ToString() == "Material" ? "active" : "")"
+                    href="@Url.Action("Index", "Material")">
+                        Material IN
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("MaterialOut", "Material")">
                     Material OUT
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AvailableStock" ? "active" : "")" 
-                   href="@Url.Action("AvailableStock", "Material")">
-                    Available Stocks
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AssignedAssets" ? "active" : "")" 
+            }
+             @if (Context.Session.GetString("UserType") == "Super Admin")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AvailableStock" ? "active" : "")" 
+                    href="@Url.Action("AvailableStock", "Material")">
+                        Available Stocks
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AssignedAssets" ? "active" : "")" 
                    href="@Url.Action("AssignedAssets", "Material")">
                     Assigned Assets
                 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "InvoiceDashboard" ? "active" : "")"
+            </li>}
+              @if (Context.Session.GetString("UserType") == "General" || Context.Session.GetString("UserType") == "Admin" || Context.Session.GetString("UserType") == "Super Admin")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "InvoiceDashboard" ? "active" : "")"
                    href="@Url.Action("InvoiceDashboard", "Material")">
                     @* <i class="fas fa-tachometer-alt"></i>  *@
                     Invoice Record
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UpdateMaterialItem" ? "active" : "")"
-                   href="@Url.Action("UpdateMaterialItem", "Material")">
-                    @* <i class="fas fa-tachometer-alt"></i>  *@
-                    Modify Material
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UpdateInvoice" ? "active" : "")"
+            }
+             @if (Context.Session.GetString("UserType") == "Super Admin")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UpdateMaterialItem" ? "active" : "")"
+                    href="@Url.Action("UpdateMaterialItem", "Material")">
+                        @* <i class="fas fa-tachometer-alt"></i>  *@
+                        Modify Material
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "UpdateInvoice" ? "active" : "")"
                    href="@Url.Action("UpdateInvoice", "Material")">
                     @* <i class="fas fa-tachometer-alt"></i>  *@
                     Update Invoice
                 </a>
-            </li>
+            </li>}
+            @if (Context.Session.GetString("UserType") == "General" || Context.Session.GetString("UserType") == "Admin" || Context.Session.GetString("UserType") == "Super Admin")
+            {
+                
+            
             <li class="nav-item">
                 <a class="nav-link @(ViewContext.RouteData.Values["Action"].ToString() == "AssetAssignmentDetails" ? "active" : "")"
                    href="@Url.Action("AssetAssignmentDetails", "Material")">
@@ -58,6 +84,7 @@
                     Asset Assignment Details
                 </a>
             </li>
+            }
         </ul>
     </div>
 </div>

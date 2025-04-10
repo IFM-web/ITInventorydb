@@ -88,23 +88,48 @@ function removeRow(button) {
     row.remove();
    
 }
-function Delete(Id,empid,e) {
-    $.ajax({
 
-        url: myurl1 + '/Material/DeleteAssignDetails',
-        type: 'post',
-        data: { Id: Id, empid: empid },
-        success: (data) => {
-            removeRow(e)
-            alert(data);
-            
+var MaterialId;
+var EmpId;
+var curElemnt;
 
-        },
-        error: (err) => {
-            alert(err)
-        }
+function Delete(Id, empid, e) {
+    $("#exampleModal").modal('show')
+    MaterialId = Id;
+    EmpId = empid;
+    curElemnt = e;
+}
 
-    })
+function modalClose() {
+    $("#exampleModal").modal('hide')
+}
+
+function Delete1() {
+    var ReceiverName = $("#ReceiverName").val();
+    if (ReceiverName != "") {
+
+        $("#exampleModal").modal('hide')
+        $("#ReceiverName").val('')
+        $.ajax({
+
+            url: myurl1 + '/Material/DeleteAssignDetails',
+            type: 'post',
+            data: { Id: MaterialId, empid: EmpId, ReceiverName: ReceiverName },
+            success: (data) => {
+                removeRow(curElemnt)
+                alert(data);
+                $("#employeeSelect").val(0);
+                $("#employeeSelect").trigger("change")
+
+            },
+            error: (err) => {
+                alert(err)
+            }
+
+        })
+    } else {
+        alert('Receiver Name Required !!');
+    }
 }
 
 
@@ -299,12 +324,15 @@ function EmployeeDetails(id) {
         data: { empId: id },
         success: function (data) {
             var data = JSON.parse(data);
+            if (data.length > 0) {
+
+            
             $("#EmployeeName").val(data[0].Name);
             $("#Department").val(data[0].Department);
             $("#EmailId").val(data[0].Email);
             $("#PhoneNo").val(data[0].PhoneNo);
 
-
+            }
         },
         error: (err) => {
             alert(err)

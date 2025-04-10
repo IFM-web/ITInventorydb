@@ -69,10 +69,10 @@ namespace ContentManagementSystem.Models
         public string RecordDate { get; set; } 
         public string WindowsKey { get; set; }
         public string MSOfficeKey { get; set; }
-
+        public string ReceiverName { get; set; }
         // Navigation properties
         //public virtual Material Material { get; set; }
-        
+
     }
 
 

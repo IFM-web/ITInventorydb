@@ -63,6 +63,7 @@
                                 <th>Asset</th>
                                 <th>Serial No</th>
                                 <th>Model No</th>
+                                <th>Item Details</th>
                                 <th>Warranty Date</th>
                                 <th>Assignment Date</th>
                                 <th>Status</th>
@@ -81,6 +82,38 @@
                                     <td>@asset.AssetName</td>
                                     <td>@asset.SerialNo</td>
                                     <td>@asset.ModelNo</td>
+                                    <td>
+                                        @if (asset.ItemName != "")
+                                        {
+                                            @asset.ItemName
+                                            
+                                        }
+                                        else if (asset.AssetName == "Desktop" || asset.AssetName == "Laptop" || asset.AssetName == "Server")
+                                        {
+                                            <span>Gen: @asset.Generation</span>
+
+                                            <br />
+                                            <span>Processor: @asset.Processor</span>
+
+                                            <br />
+                                            <span>RAM: @asset.RAMCapacity GB</span>
+
+                                            <br />
+                                            <span>HDD: @asset.HardDisk</span>
+                                            @if (!string.IsNullOrEmpty(asset.SSDCapacity))
+                                            {
+                                                <br />
+
+                                                <span>SSD: @asset.SSDCapacity</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(asset.AssetName))
+                                            {
+                                                <br />
+
+                                                @asset.Other
+                                            }
+                                        }
+                                    </td>
                                     <td>@(asset.WarrantyDate ?? "-")</td>
                                     <td>@(asset.AssignmentDate ?? "-")</td>
                                     <td>
@@ -105,6 +138,7 @@
                                 <th>Asset</th>
                                 <th>Serial No</th>
                                 <th>Model No</th>
+                                <th>Item Details</th>
                                 <th>Warranty Date</th>
                                 <th>Assignment Date</th>
 
@@ -124,6 +158,38 @@
                                     <td>@asset.AssetName</td>
                                     <td>@asset.SerialNo</td>
                                     <td>@asset.ModelNo</td>
+                                    <td>
+                                        @if (asset.ItemName != "")
+                                        {
+                                            @asset.ItemName
+
+                                        }
+                                        else if (asset.AssetName == "Desktop" || asset.AssetName == "Laptop" || asset.AssetName == "Server")
+                                        {
+                                            <span>Gen: @asset.Generation</span>
+
+                                            <br />
+                                            <span>Processor: @asset.Processor</span>
+
+                                            <br />
+                                            <span>RAM: @asset.RAMCapacity GB</span>
+
+                                            <br />
+                                            <span>HDD: @asset.HardDisk</span>
+                                            @if (!string.IsNullOrEmpty(asset.SSDCapacity))
+                                            {
+                                                <br />
+
+                                                <span>SSD: @asset.SSDCapacity</span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(asset.AssetName))
+                                            {
+                                                <br />
+
+                                                @asset.Other
+                                            }
+                                        }
+                                    </td>
                                     <td>@(asset.WarrantyDate ?? "-")</td>
                                     <td>@(asset.AssignmentDate ?? "-")</td>
                                     <td>

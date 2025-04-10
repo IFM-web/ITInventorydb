@@ -390,6 +390,7 @@ namespace ContentManagementSystem.Controllers
                         RAMCapacity = dr["RAMCapacity"].ToString(),
                         SSDCapacity = dr["SSDCapacity"].ToString(),
                         Other = dr["Other"].ToString(),
+                        ReceiverName = dr["ReceiverName"].ToString(),
                         WarrantyDate = dr["WarrantyDate"] != DBNull.Value ? Convert.ToDateTime(dr["WarrantyDate"]) : (DateTime?)null,
                         Status = dr["Status"] != DBNull.Value ? Convert.ToString(dr["Status"]) : string.Empty
                     };
@@ -553,25 +554,32 @@ namespace ContentManagementSystem.Controllers
 
                  foreach (DataRow dr in dt.Rows)
                  {
-                    AssignedAssetItem Item  = new AssignedAssetItem
+                    AssignedAssetItem Item = new AssignedAssetItem
                     {
 
 
-                         //MaterialOutId = dr["InvoiceNo"] != DBNull.Value ? dr["InvoiceNo"].ToString() : string.Empty,
-                         IssuanceDate = dr["IssuanceDate"] != DBNull.Value ? dr["IssuanceDate"].ToString() : string.Empty,
-                         CompanyName = dr["company"] != DBNull.Value ? dr["company"].ToString() : string.Empty,
-                         BranchName = dr["branch"] != DBNull.Value ? dr["branch"].ToString() : string.Empty,
-                         EmployeeId = dr["EmployeeNumber"] != DBNull.Value ? dr["EmployeeNumber"].ToString() : string.Empty,
-                         EmployeeName = dr["Employee"] != DBNull.Value ? dr["Employee"].ToString() : string.Empty,
-                         Department = dr["Department"] != DBNull.Value ? dr["Department"].ToString() : string.Empty,
-                         AssetName = dr["AssetItem"] != DBNull.Value ? dr["AssetItem"].ToString() : string.Empty,
-                         SerialNo = dr["SerialNo"] != DBNull.Value ? dr["SerialNo"].ToString() : string.Empty,
-                         ModelNo = dr["ModelNo"] != DBNull.Value ? dr["ModelNo"].ToString() : string.Empty,
-                         WarrantyDate = dr["WarrantyDate"] != DBNull.Value ? dr["WarrantyDate"].ToString() : string.Empty,
+                        //MaterialOutId = dr["InvoiceNo"] != DBNull.Value ? dr["InvoiceNo"].ToString() : string.Empty,
+                        IssuanceDate = dr["IssuanceDate"] != DBNull.Value ? dr["IssuanceDate"].ToString() : string.Empty,
+                        CompanyName = dr["company"] != DBNull.Value ? dr["company"].ToString() : string.Empty,
+                        BranchName = dr["branch"] != DBNull.Value ? dr["branch"].ToString() : string.Empty,
+                        EmployeeId = dr["EmployeeNumber"] != DBNull.Value ? dr["EmployeeNumber"].ToString() : string.Empty,
+                        EmployeeName = dr["Employee"] != DBNull.Value ? dr["Employee"].ToString() : string.Empty,
+                        Department = dr["Department"] != DBNull.Value ? dr["Department"].ToString() : string.Empty,
+                        AssetName = dr["AssetItem"] != DBNull.Value ? dr["AssetItem"].ToString() : string.Empty,
+                        SerialNo = dr["SerialNo"] != DBNull.Value ? dr["SerialNo"].ToString() : string.Empty,
+                        Generation = dr["Generation"].ToString(),
+                        HardDisk = dr["HardDisk"].ToString(),
+                        RAMCapacity = dr["RAMCapacity"].ToString(),
+                        SSDCapacity= dr["SSDCapacity"].ToString(),
+                        Processor = dr["Processor"].ToString(),
+                        ItemName = dr["ItemName"].ToString(),
+                        Other = dr["Other"].ToString(),
+                        ModelNo = dr["ModelNo"] != DBNull.Value ? dr["ModelNo"].ToString() : string.Empty,
+                        WarrantyDate = dr["WarrantyDate"] != DBNull.Value ? dr["WarrantyDate"].ToString() : string.Empty,
                         AssignmentDate = dr["AssignmentDate"].ToString(),
-                         Status = dr["Status"] != DBNull.Value ? dr["Status"].ToString() : string.Empty,
+                        Status = dr["Status"] != DBNull.Value ? dr["Status"].ToString() : string.Empty,
 
-                     };
+                    };
 
                      materialItems.Add(Item);
                  }
@@ -680,7 +688,7 @@ namespace ContentManagementSystem.Controllers
         {
             try
             {
-                var ds = util.PopulateDropDown("select Id,serialNo from MaterialItems where assetitemid='" + assentid + "'", util.strElect);
+                var ds = util.PopulateDropDown("select Id,serialNo from MaterialItems where assetitemid='" + assentid + "' and Status in ('UnAssigned','Returned')", util.strElect);
 
 
 
@@ -701,6 +709,37 @@ namespace ContentManagementSystem.Controllers
                 
 
 
+
+                return Json(JsonConvert.SerializeObject(ds.Tables[0]));
+            }
+            catch (Exception ex)
+            {
+               // _logger.LogError($"Error getting branches: {ex.Message}");
+                return Json(new object[] { });
+            }
+        } 
+        [HttpPost]
+        public JsonResult DeleteInvoiceOrItems(string? invoiceNo)
+        {
+            try
+            {
+                var ds = util.Fill("exec Usp_DeleteInvoiceOrItems @action='DeleteInvoice', @invoiceNo='" + invoiceNo + "'", util.strElect);
+
+                return Json(JsonConvert.SerializeObject(ds.Tables[0]));
+            }
+            catch (Exception ex)
+            {
+               // _logger.LogError($"Error getting branches: {ex.Message}");
+                return Json(new object[] { });
+            }
+        }  
+        [HttpPost]
+        public JsonResult DeleteAllItems(string? invoiceNo)
+        {
+            try
+            {
+                var ds = util.Fill("exec Usp_DeleteInvoiceOrItems @action='DeleteAllItem', @invoiceNo='" + invoiceNo + "'", util.strElect);
+                
 
                 return Json(JsonConvert.SerializeObject(ds.Tables[0]));
             }
@@ -866,9 +905,9 @@ namespace ContentManagementSystem.Controllers
 
 
         [HttpPost]
-        public JsonResult DeleteAssignDetails(string Id,string? empid)
+        public JsonResult DeleteAssignDetails(string Id,string? empid,string? ReceiverName)
         {
-            var msg = util.execQuery("exec Usp_DeleteAssignDetails @id ='" + Id + "',@empid='"+empid+"'", util.strElect);
+            var msg = util.execQuery("exec Usp_DeleteAssignDetails @id ='" + Id + "',@empid='"+empid+ "',@ReceiverName='"+ ReceiverName + "'", util.strElect);
             
             return Json(JsonConvert.SerializeObject(msg));
 
@@ -1011,10 +1050,19 @@ namespace ContentManagementSystem.Controllers
 
                 return Json(new { success = true, message = Id });
             }
+
+           
+
+
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+
+        public IActionResult Returnasset()
+        {
+            return View();
         }
 
 

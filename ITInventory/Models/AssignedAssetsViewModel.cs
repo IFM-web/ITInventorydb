@@ -24,5 +24,14 @@ namespace ContentManagementSystem.Models
         public string WarrantyDate { get; set; }
         public string AssignmentDate { get; set; }
         public string Status { get; set; }
+
+        public string Generation { get; set; }
+        public string? CPUCapacity { get; set; }
+        public string? HardDisk { get; set; }
+        public string? RAMCapacity { get; set; }
+        public string? SSDCapacity { get; set; }
+        public string? Processor { get; set; }
+        public string? ItemName { get; set; }
+        public string? Other { get; set; }
     }
 } 

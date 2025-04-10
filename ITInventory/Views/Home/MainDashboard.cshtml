@@ -1,0 +1,80 @@
+﻿
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        @await Html.PartialAsync("_Sidebar")
+
+        <div id="div" class="col-md-10">
+            <div id="divcont" class="container mt-4">
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+
+
+         
+
+            .chart-card {
+                background: white;
+                padding: 20px;
+                border-radius: 15px;
+              
+                max-width: 450px;
+                text-align: center;
+            }
+
+            h3 {
+                margin-bottom: 15px;
+            }
+        </style>
+
+
+
+        <div class="dashboard">
+           <div class="row justify-content-center">
+            
+            <div class="chart-card">
+                                <h3>Assigned Vs UnAssigned</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+            </div>
+             
+           
+        </div>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+<script>
+
+    const assigned = @ViewBag.Assigned;
+    const unassigned = @ViewBag.UnAssigned;
+    const Total = @ViewBag.Total;
+
+
+    new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Assigned', 'Unassigned' ],
+            datasets: [{
+                data: [assigned, unassigned],
+                backgroundColor: ['#4CAF50', '#f44336'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+   
+</script>
+
+
+
+

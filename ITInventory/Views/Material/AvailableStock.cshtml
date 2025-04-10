@@ -36,8 +36,7 @@
                                        name="receivedDateTo" 
                                        class="form-control" 
                                        placeholder="Received To Date"
-                                      />
-                               
+                                      />                               
                             </div>
                         </div>
                         <div class="col-md-4" style="margin-top:24px;">
@@ -53,8 +52,7 @@
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover" id="availableStockTable">
                         <thead class="table-light">
-                            <tr>
-                                
+                            <tr>                               
                                 <th>Invoice No</th>
                                  <th>Asset</th> 
                                 <th>Vendor</th>
@@ -134,6 +132,11 @@
                                         <td>@(item.WarrantyDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                                         <td>
                                             <span class="badge bg-success">@item.Status</span>
+                                        @if (item.ReceiverName !="")
+                                        {
+                                            <span class="">Receiver Name: @item.ReceiverName</span>
+                                        }
+                                      
                                         </td>
                                     </tr>
 
@@ -236,7 +239,12 @@
                                 <td>@(item.WarrantyDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                                         <td>
                                             <span class="badge bg-success">@item.Status</span>
-                                        </td>
+                                    @if (item.ReceiverName != "")
+                                    {
+                                        <span class="">Receiver Name: @item.ReceiverName</span>
+                                    }
+
+                                </td>
                                 </tr>
                                 i++;
                            

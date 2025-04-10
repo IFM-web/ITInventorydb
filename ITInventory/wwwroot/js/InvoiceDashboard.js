@@ -141,6 +141,18 @@
         </thead>
         <tbody>
             `;
+
+        tableContent2 = `
+    <table class="table table-sm table-bordered mb-0">
+        <thead class="table-light">
+            <tr>
+                ${commonColumns}
+                
+                ${otherColumns}
+            </tr>
+        </thead>
+        <tbody>
+            `;
         items.forEach(function (item) {
 
             if (item.ItemName == "" || item.ItemName==null) {
@@ -174,17 +186,17 @@
             </tr>
             `;
             } else {
-                 tableContent += `
-    <table class="table table-sm table-bordered mb-0">
-        <thead class="table-light">
-            <tr>
-                ${commonColumns}
+    ////             tableContent2 += `
+    ////<table class="table table-sm table-bordered mb-0">
+    ////    <thead class="table-light">
+    ////        <tr>
+    ////            ${commonColumns}
 
-                ${otherColumns}
-            </tr>
-        </thead>
-        <tbody>
-            `;
+    ////            ${otherColumns}
+    ////        </tr>
+    ////    </thead>
+    ////    <tbody>
+    ////        `;
                 const commonCells = `
             <td>${item.SerialNo || ''}</td>
             <td>${item.ModelNo || ''}</td>
@@ -199,7 +211,7 @@
             <td>${item.ItemName || ''}</td>
             <td>${item.Other || ''}</td>
             `;
-                tableContent += `
+                tableContent2 += `
             <tr>
                 ${commonCells}
                 ${otherCells}
@@ -212,7 +224,7 @@
             tableContent += `
         </tbody>
     </table>
-    `;
+    `+ tableContent2;
 
     return tableContent;
             }

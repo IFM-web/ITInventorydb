@@ -42,8 +42,9 @@ namespace ContentManagementSystem.Controllers
                     if (errmsg != "Invalid Username")
                     {
                         HttpContext.Session.SetString("UserId", ds.Tables[0].Rows[0]["UserId"].ToString());
+                        HttpContext.Session.SetString("UserType", ds.Tables[0].Rows[0]["UserType"].ToString());
                         HttpContext.Session.SetString("UserName", ds.Tables[0].Rows[0]["UserName"].ToString());
-                        return RedirectToAction("Index", "Material");
+                        return RedirectToAction("MainDashboard", "Home");
                     }
                     else
                         ViewBag.msg = errmsg;
