@@ -199,6 +199,7 @@
                 <input type="file" id="invoiceUpload" name="ImageFile" style="display :None" />
             </div>
         </div>
+                
                 <div class="table-responsive mt-4 w-100" id="mydiv1">
                     <table class="table table-bordered" id="itemsTable">
                         <thead>
@@ -212,8 +213,11 @@
                                 <th>RAM (GB)</th>
                                 <th>HDD</th>
                                 <th>SSD</th>
-                               
+
                                 <th>Warranty Date</th>
+                                <th>WindowsKey</th>
+                                <th>MSOfficeKey</th>
+                              
                                 <th>Other Details</th>
                                 <th>Action</th> 
                             </tr>
@@ -228,7 +232,7 @@
                                 <th>Asset</th>
                                 <th>Serial No</th>
                                 <th>Model No</th>
-                                <th>Name</th>
+                                <th>	Item Name</th>
                                 <th>Warranty Date</th>
                                 <th>Other Details</th>
                                 <th>Action</th>
@@ -240,6 +244,8 @@
                 </div>
                
                     <div class="text-end mt-3">
+                    <button type="button" class="btn btn-secondary" onclick="addNewRow()">Add More Items</button>
+                    <button type="button" class="btn btn-secondary" onclick="addNewRow2()">Add More Other</button>
                     <button type="submit" onclick="DeleteInvoiceOrItems()" class="btn btn-primary" id="submitButton">
                             Delete Invoice
                         </button>
@@ -253,8 +259,7 @@
                     </div>
                 </div>
 
-                @* <button type="button" class="btn btn-secondary" onclick="addNewRow()">Add More Items</button> *@
-                @* <button type="button" class="btn btn-secondary" onclick="addNewRow2()">Add More Other</button> *@
+           
             </div>
 
 
@@ -285,8 +290,8 @@
         $(".serailno").select2();
 
         function addItems() {
-            $("#mydiv").toggle();
-            $("#mydiv1").toggle();
+           // $("#mydiv").toggle();
+            //$("#mydiv1").toggle();
 
         }
 

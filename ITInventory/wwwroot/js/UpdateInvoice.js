@@ -50,6 +50,7 @@ function GetDetailsMaterialIn() {
                     <td><input type='text' id='ModelNo' name='ModelNo' class='mandatory' value='${e.ModelNo || ''}'</td>
                     <td><input type='text' id='ItemName' name='ItemName' class='mandatory' value='${e.ItemName || ''}'</td>
                     <td><input type='date' id='WarrantyDate' name='WarrantyDate' class='mandatory' value="${e.WarrantyDate ? e.WarrantyDate.split('T')[0] : ''}"></td>
+                   
                     <td><input type='text' id='Other' value='${e.Other || ''}'</td>
                     <td><button class='btn btn-danger' onclick="DeleteItem('${e.Id}',this)">Delete</button></td>
                   
@@ -72,9 +73,10 @@ function GetDetailsMaterialIn() {
                 <td>
     <input type='date' id='WarrantyDate' name='WarrantyDate' class='mandatory'
            value="${e.WarrantyDate ? e.WarrantyDate.split('T')[0] : ''}">
-</td>
+</td>  <td><input type='text' id='WindowsKey' value='${e.WindowsKey || ''}'</td>
+                      <td><input type='text' id='MSOfficeKey' value='${e.MSOfficeKey || ''}'</td>
                     <td><input type='text' id='Other' value='${e.Other || ''} '</td>
-                    <td><button class='btn btn-danger' onclick="DeleteItem('${e.Id}'),this">Delete</button></td>
+                    <td><button class='btn btn-danger' onclick="DeleteItem('${e.Id}',this)">Delete</button></td>
                 
                   
                   </tr>`
@@ -124,7 +126,8 @@ function DeleteItem(Id,e) {
             data = JSON.parse(data);
           
             if (data == "Successfull") {
-                removeRow(e)
+                var row = e.closest('tr');
+                row.remove();
                 alert("Item Has been Deleted Successfull");
 
             } else {
@@ -231,7 +234,7 @@ function binddetails(e, el) {
             row.find(".ssd-cell").text('')
             row.find(".othername").text('')
             row.find(".warranty-date-cell").text('')
-            row.find(".other-details-cell").text('')
+            //row.find(".other-details-cell").text('')
 
 
             var data = JSON.parse(data);
@@ -250,7 +253,7 @@ function binddetails(e, el) {
                 row.find(".ssd-cell").text(data[i].SSDCapacity || '')
                 row.find(".othername").text(data[i].ItemName || '')
                 row.find(".warranty-date-cell").text(data[i].WarrantyDate || '')
-                row.find(".other-details-cell").text(data[i].Other || '')
+               // row.find(".other-details-cell").text(data[i].Other || '')
 
 
             }
@@ -709,6 +712,7 @@ function Update() {
             $("#itemsTableBody TR").each(function (index, row) {
                 var Items = {};
                 if ($(row).find('#SerialNo').val() != '') {
+                    Items.Check = $(row).find("#Newadd").text();
                     Items.matrialitemid = $(row).find("#matrialitemid").text();
                     Items.AssetItemId = $(row).find('#AssetItemId').val();
                     Items.ModelNo = $(row).find('#ModelNo').val();
@@ -719,6 +723,8 @@ function Update() {
                     Items.HardDisk = $(row).find('#HardDisk').val();
                     Items.SSDCapacity = $(row).find('#SSDCapacity').val();
                     Items.WarrantyDate = $(row).find('#WarrantyDate').val();
+                    Items.WindowsKey = $(row).find('#WindowsKey').val();
+                    Items.MSOfficeKey = $(row).find('#MSOfficeKey').val();
                     Items.Other = $(row).find('#Other').val();                   
                     itemsArray.push(Items);
                 }
@@ -732,6 +738,7 @@ function Update() {
                 if ($(row).find('#SerialNo').val() != '') {
 
                     Items.matrialitemid = $(row).find("#matrialitemid").text();
+                    Items.Check = $(row).find("#Newadd").text();
                     Items.SerialNo = $(row).find('#SerialNo').val();
                     Items.AssetItemId = $(row).find('#AssetItemId').val();
                     Items.ModelNo = $(row).find('#ModelNo').val();
@@ -743,6 +750,8 @@ function Update() {
                     Items.RAMCapacity = $(row).find('#RAMCapacity').val();
                     Items.HardDisk = $(row).find('#HardDisk').val();
                     Items.SSDCapacity = $(row).find('#SSDCapacity').val();
+                    Items.WindowsKey = $(row).find('#WindowsKey').val();
+                    Items.MSOfficeKey = $(row).find('#MSOfficeKey').val();
                    
                     itemsArray.push(Items);
                 }
@@ -848,4 +857,157 @@ function DeleteAllItems() {
     }
 }
 
+function initializeRowEvents(row) {
+    const assetSelect = row.find('#AssetItemsgrid');
+    const serialNoSelect = row.find('.serialno-select');
 
+    // Initialize Select2 for serial number dropdown
+    serialNoSelect.select2({
+        tags: true,
+        width: '100%',
+        ajax: {
+            url: myurl + '/Material/GetAvailableSerialNumbers',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    assetId: assetSelect.val(),
+                    search: params.term || ''
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(item => ({
+                        id: item.serialNo,
+                        text: item.serialNo,
+                        modelNo: item.modelNo,
+                        generation: item.generation,
+                        processor: item.processor,
+                        ramCapacity: item.ramCapacity,
+                        hardDisk: item.hardDisk,
+                        ssdCapacity: item.ssdCapacity,
+                        windowsKey: item.windowsKey,
+                        msOfficeKey: item.msOfficeKey,
+                        warrantyDate: item.warrantyDate,
+                        other: item.other
+                    }))
+                };
+                data = e.params.data;
+                const selectedAsset = assetSelect.find('option:selected').text();
+                const isComputerAsset = ['Desktop', 'Laptop', 'Server'].includes(selectedAsset);
+
+                // Format warranty date to show only date
+                const formattedWarrantyDate = data.warrantyDate ? new Date(data.warrantyDate).toLocaleDateString('en-GB') : '';
+
+                // Always display these fields
+                row.find('.model-no-cell').text(data.modelNo || '');
+                row.find('.warranty-date-cell').text(formattedWarrantyDate);
+                row.find('.other-details-cell').text(data.other || '');
+
+                if (isComputerAsset) {
+                    // Auto-fill computer-specific fields
+                    row.find('.generation-cell').text(data.generation || '');
+                    row.find('.processor-cell').text(data.processor || '');
+                    row.find('.ram-cell').text(data.ramCapacity || '');
+                    row.find('.hdd-cell').text(data.hardDisk || '');
+                    row.find('.ssd-cell').text(data.ssdCapacity || '');
+                    row.find('.windows-key').val(data.windowsKey || '');
+                    row.find('.msoffice-key').val(data.msOfficeKey || '');
+                }
+            }
+        },
+        placeholder: 'Search or enter serial number',
+        allowClear: true
+    });
+}
+function addNewRow() {
+    if ($("#InvoiceNo").val() != "0") {
+        var tr = `
+ <tr>                            <td class='d-none' Id='Newadd'>1</td>
+                                <td>
+                                    <select name="Asset Item" class="form-control asset-select mandatory" id="AssetItemId" onchange="bindserailno(this.value,this)" style="border: 1px solid lightgray;">
+                                        <option value="0">Select</option>
+                                                <option value="1">Laptop</option>
+                                                <option value="2">Desktop</option>
+                                                <option value="3">Server</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type='text' class="form-control mandatory" name='SerialNo'  id='SerialNo' placeholder='Enter SerialNo'/>
+                                </td>
+                                <td class="model-no-cell"> <input type='text' id='ModelNo' name='ModelNo' class="form-control mandatory" placeholder='Enter Model No'/></td>
+                                <td class="matreailId d-none"> <input type='text' class="form-control" placeholder='Enter '/></td>
+
+                                <td class="generation-cell "> <input type='text' id='Generation' name='Generation' class="form-control mandatory" placeholder='Enter Generation'/></td>
+                                <td class="processor-cell"> <input type='text' id='Processor' name='Processor' class="form-control mandatory" placeholder='Enter Processor'/></td>
+                                <td class="ram-cell "> <input type='text' id='RAMCapacity' name='RAMCapacity' class="form-control mandatory" placeholder='Enter RAM'/></td>
+                                <td class="hdd-cell"> <input type='text' id='HardDisk' class="form-control" placeholder='Enter HDD'/></td>
+                                <td class="ssd-cell "> <input type='text' id='SSDCapacity' class="form-control" placeholder='Enter SSD'/></td>
+                                 <td class="warranty-date-cell"> <input type='date' id='WarrantyDate' name='WarrantyDate' class="form-control ssd mandatory" placeholder='Enter warranty-dat'/></td>
+                                <td class="">
+                                    <input type="text" id="WindowsKey" class="form-control windows-key" name="WindowsKey" placeholder='Enter WindowsKey'>
+                                </td>
+                                <td class="">
+                                    <input type="text" class="form-control msoffice-key" id="MSOfficeKey" name="MSOfficeKey" placeholder='Enter MSOfficeKey'>
+                                </td>
+                               
+                                <td class="other-details-cell">
+                                  <input type="text" class="form-control otherDetails" id='Other' name="otherDetails" placeholder='Enter otherDetails'>
+                                </td>
+                                <td>
+                                    <button type="button" onclick="removeRow(this)" class="btn btn-danger btn-sm remove-row">Remove</button>
+                                </td>
+                            </tr>
+    
+    
+    `
+        $("#itemsTableBody").append(tr);
+    }
+}
+
+
+function addNewRow2() {
+    if ($("#InvoiceNo").val() != "0") {
+        var tr = `<tr> <td class='d-none' Id='Newadd'>1</td>
+                                <td>
+                                    <select name="Asset Item" class="form-control asset-select" id="AssetItemId" onchange="bindserailno(this.value,this)" style="border: 1px solid lightgray;">
+
+                                                <option value="4">Others</option>
+                                    </select>
+                                </td>
+                                <td>
+                                  <input type='text' class="form-control mandatory" name='Serial NO' id='SerialNo' placeholder='Enter SerialNo'  />
+                                </td>
+                                <td class="model-no-cell"><input type='text' id='ModelNo' name='Model No' class="form-control mandatory"  placeholder='Enter Model No' /></td>
+                                <td class="matreailId d-none"><input type='text' class="form-control" placeholder='Enter Model No' /></td>
+                                <td class="othername"><input type='text' id='ItemName' class="form-control" placeholder='Enter Other Name'/></td>
+                                <td class="generation-cell computer-column"><input type='text' class="form-control"  placeholder='Enter generation' /></td>
+                                <td class="processor-cell computer-column"><input type='text' class="form-control"  placeholder='Enter processor' /></td>
+                                <td class="ram-cell computer-column"><input type='text' class="form-control"  placeholder='Enter RAM' /></td>
+                                <td class="hdd-cell computer-column"><input type='text' class="form-control"  placeholder='Enter HDD' /></td>
+                                <td class="ssd-cell computer-column"><input type='text' class="form-control"  placeholder='Enter  SSD' /></td>
+                                <td class="computer-column">
+                                    <input type="text" class="form-control  windows-key" id="WindowsKey" name="WindowsKey"  placeholder='Enter WindowsKey' >
+                                </td>
+                                <td class="computer-column">
+                                    <input type="text" class="form-control msoffice-key" id="MSOfficeKey" placeholder='Enter OMSOfficeKey' name="MSOfficeKey">
+                                </td>
+                                <td class="warranty-date-cell"><input type='date' id='WarrantyDate' name='WarrantyDate'  class="form-control mandatory"/></td>
+                                <td class="other-details-cell"><input type='text' placeholder='Enter Other Details' class="form-control" id='Other'/></td>
+                                <td>
+                                    <button type="button" onclick="removeRow(this)" class="btn btn-danger btn-sm remove-row2">Remove</button>
+                                </td>
+                            </tr>`;
+
+        $("#itemsTableBody2").append(tr);
+    }
+}
+
+
+function removeRow(button) {
+  
+    var row = button.closest('tr');
+
+    row.remove();
+
+}

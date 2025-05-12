@@ -112,7 +112,11 @@
                                 <th>Asset</th>
                                 <th>Vendor</th>
                                 <th>Manufacturer</th>
-                                <th>Invoice Image</th>
+                                @if (Context.Session.GetString("UserType") == "Super Admin")
+
+                                {
+                                    <th>Invoice Image</th>
+                                }
                                 <th>Total Items</th>
                             </tr>
                         </thead>
@@ -135,17 +139,26 @@
 
                                     <td>@(material.CustomVendorName ?? material.Vendor)</td>
                                     <td>@(material.CustomManufacturerName ?? material.Manufacturer)</td>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(material.ImagePath))
-                                        {
-                                            <a href="~/@material.ImagePath" target="_blank" class="btn btn-sm btn-outline-primary">
-                                               <i class="fas fa-image"></i> View
-                                            </a>
-                                        @*     <a href="@material.ImagePath" onclick="openImage('@material.ImagePath')" class="btn btn-sm btn-outline-primary">
+                                    @if (Context.Session.GetString("UserType") == "Super Admin")
+
+
+
+                                    {
+
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(material.ImagePath))
+
+                                            {
+
+                                                <a href="~/@material.ImagePath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-image"></i> View
+                                                </a>
+                                                @*     <a href="@material.ImagePath" onclick="openImage('@material.ImagePath')" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-image"></i> View
                                             </a> *@
-                                        }
-                                    </td>
+
+                                            }
+                                        </td>}
                                     <td>@material.TotalItem</td>
                                 </tr>
                                 <tr class="expandable-row" style="display: none;">

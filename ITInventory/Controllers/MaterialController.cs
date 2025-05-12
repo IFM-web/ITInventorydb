@@ -995,20 +995,24 @@ namespace ContentManagementSystem.Controllers
                 string Id = "";
                 string Metrailno = "";
                 string fileName = "";
-                //foreach (var e in objects)
-                //{
-                //    var ds2 = util.Fill(@$"exec ChekcSerailNo @SerialNo='{e["SerialNo"]}' ", util.strElect);
-                //    int no = Convert.ToInt32(ds2.Tables[0].Rows[0][0]);
-                //    if (no > 0)
-                //    {
-                //        Id = "Duplicate Serial No : " + e["SerialNo"];
-                //    }
+                foreach (var e in objects)
+                {
+                    if (e["Check"].ToString() == "1")
+                    {
+
+                   
+                    var ds2 = util.Fill(@$"exec ChekcSerailNo @SerialNo='{e["SerialNo"]}' ", util.strElect);
+                    int no = Convert.ToInt32(ds2.Tables[0].Rows[0][0]);
+                    if (no > 0)
+                    {
+                        Id = "Duplicate Serial No : " + e["SerialNo"];
+                    } }
 
 
 
 
 
-                //}
+                }
 
 
                 if (file != null && file.Length > 0 && Id=="")
@@ -1040,7 +1044,7 @@ namespace ContentManagementSystem.Controllers
                     foreach (var e in objects)
                     {
 
-                        ds1 = util.Fill(@$"exec Usp_UpdateMatrialItems @Materialid='{e["matrialitemid"]}',@Asstitemid='{e["AssetItemId"]}',@SerialNo='{e["SerialNo"]}',@Modelno='{e["ModelNo"]}',@Gen='{e["Generation"]}',@harddisk='{e["HardDisk"]}',@RamCap='{e["RAMCapacity"]}',@SSD='{e["SSDCapacity"]}',@Other='{e["Other"]}',@ItemName='{e["ItemName"]}',@Warrantydate='{e["WarrantyDate"]}',@Processs='{e["Processor"]}' ", util.strElect);
+                        ds1 = util.Fill(@$"exec Usp_UpdateMatrialItems @MaterialItemid='{e["matrialitemid"]}',@Materialid='{materialid}',@Asstitemid='{e["AssetItemId"]}',@SerialNo='{e["SerialNo"]}',@Modelno='{e["ModelNo"]}',@Gen='{e["Generation"]}',@harddisk='{e["HardDisk"]}',@RamCap='{e["RAMCapacity"]}',@SSD='{e["SSDCapacity"]}',@Other='{e["Other"]}',@ItemName='{e["ItemName"]}',@Warrantydate='{e["WarrantyDate"]}',@Processs='{e["Processor"]}',@MSOfficeKey='{e["MSOfficeKey"]}',@WindowsKey='{e["WindowsKey"]}' ", util.strElect);
                     }
 
                     Id = "Matrial In Updated SuccessFully";
