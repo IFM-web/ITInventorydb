@@ -1,10 +1,21 @@
+using System.Net;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSession();
+builder.Services.AddSession(op =>
+{
+    op.IdleTimeout = TimeSpan.FromMinutes(180);
+    op.Cookie.HttpOnly = true;
+    op.Cookie.IsEssential = true;
+
+    }
+);
+
+
 
 var app = builder.Build();
 

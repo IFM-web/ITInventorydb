@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Cryptography;
 
-namespace GuardTour
+namespace ITInventory
 {
 
     public class db_Utility
@@ -14,13 +14,7 @@ namespace GuardTour
         ClsUtility util = new ClsUtility();
 
 
-
-
         public string strElect = @"Data Source=172.16.3.2;Initial Catalog=APSDatabase;User ID=sa;Password=sqlserver@2018!@#;Encrypt=True;Trust Server Certificate=True;Connection Timeout=0; pooling='true'; Max Pool Size=200;";
-
-
-
-
 
 
         public string execQuery(string query, string constring = "")
@@ -415,8 +409,6 @@ namespace GuardTour
         }
 
 
-
-
         public void WriteLogFile(string LogPath, string Query, string Button, string Page, string IP, string BrowserName, string BrowerVersion, string javascript, string function)
         {
             try
@@ -555,8 +547,6 @@ namespace GuardTour
 
 
     }
-
-
 
 
     public class EncryptionHelper
