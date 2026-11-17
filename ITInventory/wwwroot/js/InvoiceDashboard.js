@@ -1,10 +1,10 @@
 ﻿
     function geturl() {
         let url = window.location.hostname;
-    if (url == 'localhost') {
-                return '';
-            }
-    else return '/itinventory';
+        if (url == 'localhost') {
+            return '';
+        }
+        else return '/itinventory';
         }
     let myurl = geturl();
     // Function to open the image in a new tab
